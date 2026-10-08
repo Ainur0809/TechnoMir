@@ -1,0 +1,19 @@
+services:
+  # Основная база shop. POSTGRES_DB создаёт её при первом старте.
+  db:
+    image: postgres:16
+    container_name: technomir_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: shop
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Скрипты из initdb/ выполняются автоматически при создании тома.
+      # Так проверяется идемпотентность: docker compose down -v && up -> всё встаёт с нуля.
+      - ./initdb:/docker-entrypoint-initdb.d
+
+volumes:
+  pgdata:
