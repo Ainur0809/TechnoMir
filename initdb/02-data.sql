@@ -1,0 +1,2 @@
+-- Sample data for TechnoMir database
+-- Заполняется Человеком A
