@@ -1,0 +1,2 @@
+-- Database schema for TechnoMir e-commerce platform
+-- Источник правды для схемы БД
