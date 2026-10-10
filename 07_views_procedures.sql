@@ -100,34 +100,26 @@ BEGIN
     IF p_quantity <= 0 THEN
         RAISE EXCEPTION 'Количество должно быть больше 0, передано %', p_quantity;
     END IF;
-
     -- FOR UPDATE блокирует строку товара: два одновременных заказа не продадут один остаток дважды
     SELECT price, stock INTO v_price, v_stock
     FROM products
     WHERE id = p_product_id
     FOR UPDATE;
-
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Товар % не найден', p_product_id;
     END IF;
-
     INSERT INTO orders (customer_id, status)
     VALUES (p_customer_id, 'new')
     RETURNING id INTO v_order_id;
-
     INSERT INTO order_items (order_id, product_id, quantity, unit_price)
     VALUES (v_order_id, p_product_id, p_quantity, v_price);
-
     IF v_stock < p_quantity THEN
         -- исключение откатывает заказ и позицию, созданные выше
         RAISE EXCEPTION 'Недостаточно товара %: на складе %, запрошено %',
                         p_product_id, v_stock, p_quantity;
     END IF;
-
     UPDATE products SET stock = stock - p_quantity WHERE id = p_product_id;
-
     UPDATE orders SET total = v_price * p_quantity WHERE id = v_order_id;
-
     RETURN v_order_id;
 END;
 $$;
@@ -162,19 +154,15 @@ DECLARE
 BEGIN
     SELECT price, stock INTO v_price, v_stock
     FROM products WHERE id = p_product_id FOR UPDATE;
-
     INSERT INTO orders (customer_id, status) VALUES (p_customer_id, 'new')
     RETURNING id INTO v_order_id;
-
     INSERT INTO order_items (order_id, product_id, quantity, unit_price)
     VALUES (v_order_id, p_product_id, p_quantity, v_price);
-
     IF v_stock IS NULL OR v_stock < p_quantity THEN
         ROLLBACK;                                   -- явный откат заказа и позиции
         RAISE NOTICE 'Заказ отменён: недостаточно товара %', p_product_id;
         RETURN;
     END IF;
-
     UPDATE products SET stock = stock - p_quantity WHERE id = p_product_id;
     UPDATE orders   SET total = v_price * p_quantity WHERE id = v_order_id;
     COMMIT;                                         -- явная фиксация
