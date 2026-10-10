@@ -167,3 +167,14 @@ CREATE INDEX idx_products_category        ON products(category_id);
 CREATE INDEX idx_orders_customer          ON orders(customer_id);
 CREATE INDEX idx_order_items_order_product ON order_items(order_id, product_id); -- составной
 CREATE INDEX idx_reviews_product          ON reviews(product_id);
+
+-- ============================================================================
+-- 2.4. ALTER TABLE — изменения схемы после создания таблиц.
+-- Выполняются здесь же, поэтому data.sql уже пишет в customers.name
+-- и не заполняет suppliers.country.
+-- ============================================================================
+ALTER TABLE products  ADD COLUMN sku VARCHAR(50);                       -- новый столбец
+ALTER TABLE products  ADD CONSTRAINT uq_products_sku UNIQUE (sku);      -- UNIQUE отдельной командой
+ALTER TABLE customers RENAME COLUMN full_name TO name;                  -- переименование
+ALTER TABLE suppliers DROP COLUMN country;                              -- удаление столбца
+ALTER TABLE addresses ALTER COLUMN postal_code TYPE VARCHAR(10);        -- смена типа
