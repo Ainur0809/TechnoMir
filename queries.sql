@@ -99,7 +99,7 @@ UNION ALL SELECT 'orders',            COUNT(*) FROM orders
 UNION ALL SELECT 'order_items',       COUNT(*) FROM order_items
 UNION ALL SELECT 'payments',          COUNT(*) FROM payments
 UNION ALL SELECT 'reviews',           COUNT(*) FROM reviews;
--- 11 строк: 10, 12, 6, 6, 4, 25, 10, 20, 40, 15, 15 — совпадает с 3.1
+-- 11 строк: 30, 36, 10, 10, 8, 60, 31, 60, 140, 50, 50 — все объёмы не меньше требуемых в 3.1
 
 -- Задание 3.2: первые 5 товаров (PostgreSQL / MySQL)
 SELECT * FROM products ORDER BY id LIMIT 5;
@@ -116,20 +116,20 @@ BEGIN;
 UPDATE products
 SET price = ROUND(price * 1.10, 2)
 WHERE category_id = (SELECT id FROM categories WHERE name = 'Холодильники');
--- UPDATE 4 (товары 1–4)
+-- UPDATE 7 (все холодильники)
 
 -- Задание 3.3: заказы paid старше 3 дней -> shipped
 UPDATE orders
 SET status = 'shipped'
 WHERE status = 'paid'
   AND created_at < CURRENT_TIMESTAMP - INTERVAL '3 days';
--- UPDATE 1 (заказ 16 от 2026-10-01)
+-- UPDATE 2 (заказы 16 и 60; число зависит от текущей даты)
 
 -- Задание 3.3: is_default = TRUE только у одного адреса каждого покупателя
 -- (основным считаем адрес с наименьшим id, остальные — FALSE)
 UPDATE addresses a
 SET is_default = (a.id = (SELECT MIN(a2.id) FROM addresses a2 WHERE a2.customer_id = a.customer_id));
--- UPDATE 12
+-- UPDATE 36 (все адреса)
 
 -- Проверка: у каждого покупателя ровно один основной адрес
 SELECT customer_id, COUNT(*) FILTER (WHERE is_default) AS default_cnt
@@ -168,10 +168,10 @@ SELECT
 -- Задание 3.4: удалить категорию, в которой есть товары («Холодильники»)
 DELETE FROM categories WHERE name = 'Холодильники';
 -- DELETE 1 — удаление прошло.
--- products.category_id объявлен с ON DELETE SET NULL: 4 холодильника остались,
+-- products.category_id объявлен с ON DELETE SET NULL: 7 холодильников остались,
 -- но без категории. Если бы стоял RESTRICT, база отказала бы с ошибкой FK.
-SELECT id, name, category_id FROM products WHERE id BETWEEN 1 AND 4;
--- 4 строки, category_id = NULL
+SELECT id, name, category_id FROM products WHERE name ILIKE 'Холодильник%';
+-- 7 строк, category_id = NULL
 
 ROLLBACK;
 
@@ -183,7 +183,7 @@ SELECT * FROM customers WHERE phone = NULL;
 
 -- Задание 3.5: правильная проверка на NULL
 SELECT * FROM customers WHERE phone IS NULL;
--- 2 строки (покупатели 5 и 9)
+-- 4 строки (покупатели 5, 9, 17, 24)
 
 -- Задание 3.5: NULL = NULL и NULL IS NULL
 SELECT NULL = NULL AS eq, NULL IS NULL AS is_null;
@@ -201,19 +201,19 @@ SELECT id, name, model, price, stock
 FROM products
 WHERE price > 10000 AND stock > 0
 ORDER BY price DESC, name;
--- 13 строк — ожидаемо (товары 8, 12, 25 дороже 10 000, но stock = 0)
+-- 34 строки — ожидаемо (товары 8, 12, 25 дороже 10 000, но stock = 0)
 
 -- Задание 4.1.2: уникальные города из адресов
 SELECT DISTINCT city
 FROM addresses
 ORDER BY city;
--- 9 строк (12 адресов, Москва и Казань повторяются)
+-- 13 строк (36 адресов, города повторяются)
 
 -- Задание 4.1.3: покупатели с email на @gmail.com и с телефоном
 SELECT id, name, email, phone
 FROM customers
 WHERE email LIKE '%@gmail.com' AND phone IS NOT NULL;
--- 3 строки (1, 4, 8) — ожидаемо: у покупателя 5 тоже gmail, но нет телефона
+-- 9 строк (1, 4, 8, 11, 14, 20, 23, 26, 29) — ожидаемо: у покупателей 5 и 17 тоже gmail, но нет телефона
 
 -- Задание 4.1.4а: товары брендов Samsung и LG через JOIN + IN
 SELECT p.id, p.name, p.model, b.name AS brand
@@ -221,37 +221,37 @@ FROM products p
 JOIN brands b ON b.id = p.brand_id
 WHERE b.name IN ('Samsung', 'LG')
 ORDER BY b.name, p.price;
--- 8 строк (Samsung 5, LG 3)
+-- 15 строк (Samsung 8, LG 7)
 
 -- Задание 4.1.4б: товары со словом «холодильник» в названии
 -- LIKE чувствителен к регистру, поэтому ILIKE (MySQL: LIKE с регистронезависимой collation)
 SELECT id, name, model
 FROM products
 WHERE name ILIKE '%холодильник%';
--- 4 строки. С LIKE '%холодильник%' — 0 строк: названия начинаются с заглавной «Х».
+-- 7 строк. С LIKE '%холодильник%' — 0 строк: названия начинаются с заглавной «Х».
 
 -- Задание 4.1.5: заказы со статусом paid или shipped
 SELECT id, customer_id, status, total, created_at
 FROM orders
 WHERE status IN ('paid', 'shipped');
--- 2 строки (15 shipped, 16 paid)
+-- 12 строк (10 shipped, 2 paid)
 
 -- Задание 4.1.6: заказы за октябрь 2026 через BETWEEN
 SELECT id, status, created_at
 FROM orders
 WHERE created_at BETWEEN '2026-10-01' AND '2026-10-31';
--- 5 строк (16–20). Ловушка: '2026-10-31' означает 2026-10-31 00:00:00,
+-- 9 строк (16–20, 57–60). Ловушка: '2026-10-31' означает 2026-10-31 00:00:00,
 -- поэтому заказ 31 октября в 15:00 сюда не попал бы. Надёжный вариант:
 SELECT id, status, created_at
 FROM orders
 WHERE created_at >= '2026-10-01' AND created_at < '2026-11-01';
--- 5 строк
+-- 9 строк
 
 -- Задание 4.1.7а: товары НЕ из категории «Холодильники» через NOT IN
 SELECT id, name, category_id
 FROM products
 WHERE category_id NOT IN (SELECT id FROM categories WHERE name = 'Холодильники');
--- 19 строк: 25 − 4 холодильника − 2 товара без категории.
+-- 51 строка: 60 − 7 холодильников − 2 товара без категории.
 -- category_id NULL: NULL NOT IN (3) даёт NULL, а не TRUE, поэтому товары 23 и 24 пропали.
 
 -- Задание 4.1.7б: то же через NOT EXISTS
@@ -261,7 +261,7 @@ WHERE NOT EXISTS (
     SELECT 1 FROM categories c
     WHERE c.id = p.category_id AND c.name = 'Холодильники'
 );
--- 21 строка: NOT EXISTS возвращает TRUE для товаров без категории, они попали в выборку.
+-- 53 строки: NOT EXISTS возвращает TRUE для товаров без категории, они попали в выборку.
 -- Вывод: при наличии NULL NOT IN и NOT EXISTS дают разные результаты.
 
 -- Задание 4.1.8: алиасы столбцов и таблицы
@@ -269,7 +269,7 @@ SELECT p.name,
        p.price        AS price_kgs,
        p.price * 1.12 AS price_with_vat
 FROM products p;
--- 25 строк
+-- 60 строк
 
 -- Задание 4.1.9: товары класса A++ или A+ мощностью до 2000 Вт с брендом и категорией
 SELECT p.name, p.model, p.energy_class, p.power_watt,
@@ -279,7 +279,7 @@ JOIN brands b          ON b.id = p.brand_id
 LEFT JOIN categories c ON c.id = p.category_id   -- LEFT: у очистителя воздуха нет категории
 WHERE p.energy_class IN ('A++', 'A+')
   AND p.power_watt <= 2000;
--- 6 строк: 4 холодильника, стиральная машина LG F2J3HS0W, очиститель воздуха Xiaomi
+-- 9 строк: 6 холодильников, стиральные машины LG F2J3HS0W и Haier HW70, очиститель воздуха Xiaomi
 
 -- ---- 4.2 Агрегаты -----------------------------------------------------------
 
@@ -293,7 +293,8 @@ FROM products p
 LEFT JOIN categories c ON c.id = p.category_id
 GROUP BY c.name
 ORDER BY products_cnt DESC;
--- 6 строк: Мелкая техника 7, Пылесосы 5, Холодильники 4, Стиральные машины 4, Чайники 3, Без категории 2
+-- 10 строк: Кухонная техника 12, Пылесосы 10, Холодильники / Стиральные машины / Чайники по 7, Телевизоры 6,
+-- Микроволновые печи 4, Посудомоечные машины 3, Мелкая техника 2, Без категории 2
 
 -- Задание 4.2.10: сумма оплаченных заказов по месяцам (по дате платежа)
 SELECT DATE_TRUNC('month', paid_at)::DATE AS month,
@@ -302,7 +303,7 @@ FROM payments
 WHERE status = 'completed'
 GROUP BY month
 ORDER BY month;
--- 8 строк: январь–июнь, сентябрь, октябрь (в июле, августе оплат нет)
+-- 10 строк: январь–октябрь 2026
 
 -- Задание 4.2.11: покупатели, сделавшие более 2 заказов
 SELECT c.id, c.name, COUNT(*) AS orders_cnt
@@ -310,7 +311,7 @@ FROM customers c
 JOIN orders o ON o.customer_id = c.id
 GROUP BY c.id, c.name
 HAVING COUNT(*) > 2;
--- 2 строки (Анна Смирнова, Иван Петров — по 3 заказа)
+-- 12 строк (больше всех у Сергея Волкова — 5 заказов)
 
 -- Задание 4.2.12: товары со средним рейтингом >= 4 и минимум 3 отзывами
 SELECT p.id, p.name, ROUND(AVG(r.rating), 2) AS avg_rating, COUNT(*) AS reviews_cnt
@@ -318,7 +319,7 @@ FROM products p
 JOIN reviews r ON r.product_id = p.id
 GROUP BY p.id, p.name
 HAVING AVG(r.rating) >= 4 AND COUNT(*) >= 3;
--- 2 строки: холодильник Samsung (4.67, 3 отзыва), аэрогриль Philips (4.20, 5 отзывов)
+-- 4 строки: холодильник Samsung (4.75), ручной пылесос Xiaomi (4.33), пылесос Redmond (4.67), аэрогриль Philips (4.20)
 
 -- Задание 4.2.13: WHERE vs HAVING (ответ на ❓ — в README)
 -- SELECT product_id FROM reviews WHERE AVG(rating) > 4 GROUP BY product_id;
@@ -328,7 +329,7 @@ SELECT product_id, ROUND(AVG(rating), 2) AS avg_rating
 FROM reviews
 GROUP BY product_id
 HAVING AVG(rating) > 4;
--- 4 строки (товары 1, 5, 14, 16)
+-- 13 строк
 
 -- Задание 4.2.14: COUNT(*) vs COUNT(column) vs COUNT(DISTINCT column)
 SELECT COUNT(*)              AS all_rows,
@@ -336,7 +337,7 @@ SELECT COUNT(*)              AS all_rows,
        COUNT(DISTINCT phone) AS distinct_phones,
        COUNT(DISTINCT SPLIT_PART(email, '@', 2)) AS distinct_email_domains
 FROM customers;
--- 1 строка: 10 / 8 / 8 / 3.
+-- 1 строка: 30 / 26 / 26 / 3.
 -- COUNT(*) считает все строки, COUNT(phone) пропускает NULL,
 -- COUNT(DISTINCT ...) — только уникальные непустые значения (у почтовых доменов их 3).
 
@@ -350,7 +351,7 @@ JOIN orders    o ON o.id = oi.order_id
 JOIN products  p ON p.id = oi.product_id
 JOIN customers c ON c.id = o.customer_id
 ORDER BY o.id, oi.id;
--- 40 строк — все позиции
+-- 140 строк — все позиции
 
 -- Задание 4.3.16: LEFT JOIN — все покупатели и количество их заказов, включая 0
 SELECT c.id, c.name, COUNT(o.id) AS orders_cnt
@@ -358,7 +359,7 @@ FROM customers c
 LEFT JOIN orders o ON o.customer_id = c.id
 GROUP BY c.id, c.name
 ORDER BY orders_cnt DESC, c.id;
--- 10 строк; у Николая Орлова (10) — 0. COUNT(o.id), а не COUNT(*), иначе было бы 1.
+-- 30 строк; у покупателей 10, 29, 30 — 0. COUNT(o.id), а не COUNT(*), иначе было бы 1.
 
 -- Задание 4.3.17: RIGHT JOIN — все товары и количество продаж, включая непроданные
 SELECT p.id, p.name, COALESCE(SUM(oi.quantity), 0) AS sold_qty
@@ -366,7 +367,7 @@ FROM order_items oi
 RIGHT JOIN products p ON p.id = oi.product_id
 GROUP BY p.id, p.name
 ORDER BY sold_qty DESC, p.id;
--- 25 строк; у парогенератора Philips (25) — 0
+-- 60 строк; у 10 товаров (например, парогенератора Philips, id 25) — 0
 
 -- Задание 4.3.17: то же через LEFT JOIN (таблицы меняются местами)
 SELECT p.id, p.name, COALESCE(SUM(oi.quantity), 0) AS sold_qty
@@ -374,7 +375,7 @@ FROM products p
 LEFT JOIN order_items oi ON oi.product_id = p.id
 GROUP BY p.id, p.name
 ORDER BY sold_qty DESC, p.id;
--- 25 строк — тот же результат
+-- 60 строк — тот же результат
 
 -- Задание 4.3.18: FULL JOIN — товары и поставщики, включая товары без поставщика
 -- и поставщиков без товаров
@@ -383,7 +384,7 @@ FROM products p
 LEFT JOIN product_suppliers ps ON ps.product_id = p.id
 FULL JOIN suppliers s          ON s.id = ps.supplier_id
 ORDER BY p.id NULLS LAST;
--- 27 строк: 10 поставок + 16 товаров без поставщика + 1 поставщик без товаров («Восток-Электро»)
+-- 63 строки: 31 поставка + 31 товар без поставщика + 1 поставщик без товаров («Восток-Электро»)
 -- MySQL: FULL JOIN нет — эмулируется как LEFT JOIN ... UNION ... RIGHT JOIN (или второй LEFT JOIN)
 
 -- Задание 4.3.19: SELF JOIN — категория и её родительская категория
@@ -391,7 +392,7 @@ SELECT c.name AS category, parent.name AS parent_category
 FROM categories c
 LEFT JOIN categories parent ON parent.id = c.parent_id
 ORDER BY c.id;
--- 6 строк; у корневых категорий parent_category = NULL
+-- 10 строк; у корневых категорий parent_category = NULL
 
 -- Задание 4.3.20: заказы, где сумма позиций не совпадает с orders.total
 SELECT o.id, o.total, SUM(oi.quantity * oi.unit_price) AS items_sum
@@ -408,7 +409,7 @@ SELECT c.id, c.name
 FROM customers c
 LEFT JOIN orders o ON o.customer_id = c.id
 WHERE o.id IS NULL;
--- 1 строка (Николай Орлов)
+-- 3 строки (Николай Орлов, Фёдор Титов, Лилия Киселёва)
 
 -- ---- 4.4 Объединения и подзапросы -------------------------------------------
 
@@ -416,32 +417,32 @@ WHERE o.id IS NULL;
 SELECT email FROM customers
 UNION
 SELECT email FROM suppliers;
--- 14 строк: UNION убирает дубли (их нет, поэтому 10 + 4)
+-- 38 строк: UNION убирает дубли (их нет, поэтому 30 + 8)
 
 -- Задание 4.4.22: то же через UNION ALL
 SELECT email FROM customers
 UNION ALL
 SELECT email FROM suppliers;
--- 14 строк: UNION ALL не ищет дубли и поэтому быстрее; здесь результат совпал, т.к. дублей нет
+-- 38 строк: UNION ALL не ищет дубли и поэтому быстрее; здесь результат совпал, т.к. дублей нет
 
 -- Задание 4.4.23а: товары с хотя бы одним отзывом — EXISTS
 SELECT p.id, p.name
 FROM products p
 WHERE EXISTS (SELECT 1 FROM reviews r WHERE r.product_id = p.id);
--- 8 строк
+-- 30 строк
 
 -- Задание 4.4.23б: то же через IN (подзапрос)
 SELECT p.id, p.name
 FROM products p
 WHERE p.id IN (SELECT r.product_id FROM reviews r);
--- 8 строк
+-- 30 строк
 
 -- Задание 4.4.23в: то же через JOIN (DISTINCT нужен: у товара может быть несколько отзывов)
 SELECT DISTINCT p.id, p.name
 FROM products p
 JOIN reviews r ON r.product_id = p.id
 ORDER BY p.id;
--- 8 строк (без DISTINCT было бы 15 — по строке на отзыв)
+-- 30 строк (без DISTINCT было бы 50 — по строке на отзыв)
 
 -- Задание 4.4.24а: товары дороже ЛЮБОГО пылесоса (> ANY = дороже самого дешёвого)
 SELECT id, name, price
@@ -450,7 +451,7 @@ WHERE price > ANY (
     SELECT p.price FROM products p JOIN categories c ON c.id = p.category_id
     WHERE c.name = 'Пылесосы'
 );
--- 20 строк: дороже 8 990 (самый дешёвый пылесос)
+-- 49 строк: дороже 5 990 (самый дешёвый пылесос)
 
 -- Задание 4.4.24б: товары дороже ВСЕХ пылесосов (> ALL = дороже самого дорогого)
 SELECT id, name, price
@@ -459,7 +460,7 @@ WHERE price > ALL (
     SELECT p.price FROM products p JOIN categories c ON c.id = p.category_id
     WHERE c.name = 'Пылесосы'
 );
--- 8 строк: дороже 29 990 (холодильники и стиральные машины)
+-- 5 строк: дороже 74 990 (Dyson V15) — дорогие холодильники, телевизоры, стирально-сушильная машина
 
 -- Задание 4.4.25: покупатель с максимальной суммой покупок (подзапрос в WHERE)
 -- Учитываем только оплаченные платежи.
@@ -476,7 +477,7 @@ HAVING SUM(pay.amount) = (
         GROUP BY o2.customer_id
     ) t
 );
--- 1 строка: Анна Смирнова
+-- 1 строка: Тимур Романов (329 090)
 
 -- Задание 4.4.26: цена товара и средняя цена по его категории — коррелированный подзапрос
 SELECT p.id, p.name, p.price,
@@ -484,14 +485,14 @@ SELECT p.id, p.name, p.price,
         WHERE p2.category_id = p.category_id) AS category_avg
 FROM products p
 ORDER BY p.category_id NULLS LAST, p.price DESC;
--- 25 строк; у товаров без категории category_avg = NULL (NULL = NULL не совпадает)
+-- 60 строк; у товаров без категории category_avg = NULL (NULL = NULL не совпадает)
 
 -- Задание 4.4.26: то же через оконную функцию
 SELECT id, name, price,
        ROUND(AVG(price) OVER (PARTITION BY category_id), 2) AS category_avg
 FROM products
 ORDER BY category_id NULLS LAST, price DESC;
--- 25 строк; окно группирует NULL вместе, поэтому у товаров без категории — их общее среднее
+-- 60 строк; окно группирует NULL вместе, поэтому у товаров без категории — их общее среднее
 
 -- ---- 4.5 CASE и NULL-функции ------------------------------------------------
 
@@ -504,7 +505,7 @@ SELECT name, price,
        END AS price_segment
 FROM products
 ORDER BY price;
--- 25 строк: дешёвых 0 (самый дешёвый товар — 1 590), средних 14, дорогих 11
+-- 60 строк: дешёвых 0 (самый дешёвый товар — 1 590), средних 28, дорогих 32
 
 -- Задание 4.5.28: статус заказа на русском
 SELECT id, status,
@@ -517,12 +518,12 @@ SELECT id, status,
        END AS status_ru
 FROM orders
 ORDER BY id;
--- 20 строк
+-- 60 строк
 
 -- Задание 4.5.29: телефон или «не указан» (MySQL: IFNULL, SQL Server: ISNULL)
 SELECT name, COALESCE(phone, 'не указан') AS phone
 FROM customers;
--- 10 строк; у двух — «не указан»
+-- 30 строк; у четырёх — «не указан»
 
 -- Задание 4.5.30: средний рейтинг товара, без отзывов — 0
 SELECT p.id, p.name, COALESCE(ROUND(AVG(r.rating), 2), 0) AS avg_rating
@@ -530,7 +531,7 @@ FROM products p
 LEFT JOIN reviews r ON r.product_id = p.id
 GROUP BY p.id, p.name
 ORDER BY avg_rating DESC, p.id;
--- 25 строк; у 17 товаров без отзывов — 0
+-- 60 строк; у 30 товаров без отзывов — 0
 
 -- Задание 4.5.31: средний чек покупателя без ошибки деления на 0
 -- NULLIF(x, 0) превращает 0 в NULL, а деление на NULL даёт NULL, а не ошибку.
@@ -542,7 +543,7 @@ FROM customers c
 LEFT JOIN orders o ON o.customer_id = c.id AND o.status <> 'cancelled'
 GROUP BY c.id, c.name
 ORDER BY c.id;
--- 10 строк; у Николая Орлова (0 заказов) avg_check = NULL, ошибки нет
+-- 30 строк; у покупателей без заказов (10, 29, 30) avg_check = NULL, ошибки нет
 
 -- ---- 4.6 SELECT INTO / CREATE TABLE AS --------------------------------------
 
@@ -560,4 +561,4 @@ LIMIT 5;
 -- SELECT 5
 
 SELECT * FROM top_products;
--- 5 строк
+-- 5 строк: микроволновка Samsung (8 шт.), чайник Tefal (7), электрогриль Tefal, чайник Xiaomi, аэрогриль Tefal (по 6)
