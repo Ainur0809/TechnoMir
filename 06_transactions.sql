@@ -156,11 +156,17 @@ UPDATE products SET stock = stock - 1 WHERE id = 2;     -- ЗАВИСАЕТ: ж�
 UPDATE products SET stock = stock - 1 WHERE id = 1;     -- взаимное ожидание
 -- Примерно через 1 секунду (deadlock_timeout) одна из сессий получает:
 -- ERROR: deadlock detected
--- DETAIL: Process 123 waits for ShareLock on transaction 456; blocked by process 789.
---         Process 789 waits for ShareLock on transaction 457; blocked by process 123.
+-- DETAIL: Process 534 waits for ShareLock on transaction 953; blocked by process 536.
+--         Process 536 waits for ShareLock on transaction 952; blocked by process 534.
 -- HINT: See server log for query details.
--- Откатывается транзакция той сессии, которая получила ошибку (обычно — та,
--- что «замкнула» цикл, т.е. сессия 2). Вторая сессия продолжает работу.
+-- CONTEXT: while updating tuple (0,52) in relation "products"
+-- Откатывается транзакция той сессии, которая получила ошибку; вторая сессия
+-- сразу получает свою блокировку и продолжает работу (её UPDATE выполнится).
+-- Кто станет «жертвой», зависит от времени: проверку на deadlock запускает
+-- сессия, которая ждёт блокировку дольше deadlock_timeout (1 с) в момент,
+-- когда цикл уже замкнулся. При ручном выполнении в DBeaver (между шагами
+-- больше секунды) это обычно сессия 2 — её ожидание замыкает цикл. Если шаги
+-- выполнять быстро, жертвой может оказаться сессия 1.
 -- Завершить обе:
 ROLLBACK;   -- в обеих сессиях (в упавшей транзакция уже aborted)
 

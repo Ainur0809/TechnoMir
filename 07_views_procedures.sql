@@ -55,13 +55,13 @@ LEFT JOIN (
 
 -- SELECT из view — как из обычной таблицы
 SELECT * FROM v_order_summary ORDER BY order_id;
--- 20 строк; у заказа 20 items_cnt = 0
+-- 60 строк; у заказа 20 items_cnt = 0
 
 SELECT * FROM v_order_summary WHERE status = 'new';
 -- 4 строки (заказы 17–20)
 
 SELECT * FROM v_product_stats ORDER BY sold_qty DESC, product_id LIMIT 5;
--- 5 строк — самые продаваемые товары
+-- 5 строк; первая — микроволновая печь Samsung (продано 8 шт.)
 
 -- ❓ Хранит ли view данные? Проверка: меняем цену и сразу видим её во view.
 BEGIN;
@@ -135,7 +135,7 @@ ROLLBACK;
 -- Нехватка товара -> исключение -> откат
 SELECT place_order(2, 8, 1);
 -- ERROR: Недостаточно товара 8: на складе 0, запрошено 1
-SELECT COUNT(*) FROM orders;                          -- по-прежнему 20: заказ не остался
+SELECT COUNT(*) FROM orders;                          -- по-прежнему 60: заказ не остался
 
 
 -- Вариант PROCEDURE с явными COMMIT / ROLLBACK (PostgreSQL 11+).
@@ -170,8 +170,9 @@ BEGIN
 END;
 $$;
 
--- CALL place_order_proc(2, 8, 1);    -- NOTICE: Заказ отменён: недостаточно товара 8
--- CALL place_order_proc(2, 15, 1);   -- NOTICE: Заказ N оформлен (ВНИМАНИЕ: изменит данные)
+-- CALL place_order_proc(2, 8, 1);    -- NOTICE: Заказ отменён: недостаточно товара 8; заказов по-прежнему 60
+-- CALL place_order_proc(2, 15, 1);   -- NOTICE: Заказ N оформлен (ВНИМАНИЕ: изменит данные —
+--                                       после демонстрации пересоздайте базу: docker compose down -v && up -d)
 
 
 -- ---- 7.3. Backup -----------------------------------------------------------

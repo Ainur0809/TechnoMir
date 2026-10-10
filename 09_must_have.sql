@@ -15,7 +15,7 @@ SELECT COALESCE(c.name, 'Без категории') AS category,
 FROM products p
 LEFT JOIN categories c ON c.id = p.category_id
 ORDER BY p.category_id NULLS LAST, rn;
--- 25 строк; нумерация начинается заново в каждой категории
+-- 60 строк; нумерация начинается заново в каждой категории
 
 -- Задание 9.1: 2-й по дороговизне товар в каждой категории
 -- (оконную функцию нельзя писать в WHERE — сначала считаем её в подзапросе)
@@ -28,8 +28,11 @@ FROM (
     LEFT JOIN categories c ON c.id = p.category_id
 ) t
 WHERE rnk = 2;
--- 6 строк — по одной на каждую категорию с товарами, включая «Без категории».
--- Корневая «Крупная техника» товаров напрямую не содержит, поэтому её нет.
+-- 10 строк: 8 подкатегорий, «Мелкая техника» (в ней товары лежат и напрямую)
+-- и «Без категории». Корневая «Крупная техника» товаров напрямую не содержит,
+-- поэтому её нет. Например, 2-й по цене холодильник — Haier French Door (129 990).
+-- DENSE_RANK, а не ROW_NUMBER: при двух одинаковых максимальных ценах «вторым»
+-- будет следующий по цене товар, а не второй из двух одинаковых.
 
 -- Задание 9.1: нарастающий итог выручки по месяцам
 SELECT month,
@@ -43,7 +46,7 @@ FROM (
     GROUP BY 1
 ) m
 ORDER BY month;
--- 8 строк; последняя строка running_total = вся выручка
+-- 10 строк (январь–октябрь 2026); последняя строка running_total = вся выручка
 
 -- Задание 9.1: LAG / LEAD — изменение выручки к прошлому месяцу
 SELECT month, revenue,
@@ -55,10 +58,10 @@ FROM (
     FROM payments WHERE status = 'completed' GROUP BY 1
 ) m
 ORDER BY month;
--- 8 строк; у первого месяца prev_month = NULL, у последнего next_month = NULL
+-- 10 строк; у первого месяца prev_month = NULL, у последнего next_month = NULL
 
 -- ❓ RANK vs DENSE_RANK vs ROW_NUMBER при одинаковых значениях.
--- У покупателей 1 и 2 по 3 заказа, у семерых — по 2: есть «ничьи».
+-- У многих покупателей одинаковое число заказов — есть «ничьи».
 SELECT c.name,
        COUNT(o.id) AS orders_cnt,
        ROW_NUMBER() OVER (ORDER BY COUNT(o.id) DESC, c.id) AS row_number,
@@ -68,11 +71,15 @@ FROM customers c
 LEFT JOIN orders o ON o.customer_id = c.id
 GROUP BY c.id, c.name
 ORDER BY orders_cnt DESC, c.id;
--- 10 строк:
---   orders_cnt 3 -> row_number 1,2   rank 1,1   dense_rank 1,1
---   orders_cnt 2 -> row_number 3..9  rank 3     dense_rank 2
---   orders_cnt 0 -> row_number 10    rank 10    dense_rank 3
--- ROW_NUMBER всегда уникален, RANK после ничьей пропускает номера, DENSE_RANK — нет.
+-- 30 строк:
+--   orders_cnt 5 (1 чел.)   -> row_number 1       rank 1    dense_rank 1
+--   orders_cnt 4 (1 чел.)   -> row_number 2       rank 2    dense_rank 2
+--   orders_cnt 3 (10 чел.)  -> row_number 3..12   rank 3    dense_rank 3
+--   orders_cnt 2 (6 чел.)   -> row_number 13..18  rank 13   dense_rank 4
+--   orders_cnt 1 (9 чел.)   -> row_number 19..27  rank 19   dense_rank 5
+--   orders_cnt 0 (3 чел.)   -> row_number 28..30  rank 28   dense_rank 6
+-- ROW_NUMBER всегда уникален, RANK после ничьей пропускает номера (3 -> 13),
+-- DENSE_RANK идёт подряд без пропусков (3 -> 4).
 
 
 -- ---- 9.2. CTE (WITH) -------------------------------------------------------
@@ -88,7 +95,8 @@ SELECT c.id, c.name, cs.spent
 FROM customer_spent cs
 JOIN customers c ON c.id = cs.customer_id
 WHERE cs.spent = (SELECT MAX(spent) FROM customer_spent);
--- 1 строка: Анна Смирнова — тот же результат, что в 4.25, но подзапрос написан один раз
+-- 1 строка: Тимур Романов (id 27), 329 090 — тот же результат, что в 4.25,
+-- но подзапрос написан один раз и переиспользуется
 
 -- Задание 9.2: рекурсивный CTE — дерево категорий с уровнем вложенности
 WITH RECURSIVE tree AS (
@@ -105,9 +113,9 @@ WITH RECURSIVE tree AS (
 SELECT REPEAT('    ', level - 1) || name AS category_tree, level, path
 FROM tree
 ORDER BY path;
--- 6 строк:
---   Крупная техника (1) -> Стиральные машины (2), Холодильники (2)
---   Мелкая техника (1)  -> Пылесосы (2), Чайники (2)
+-- 10 строк:
+--   Крупная техника (1) -> Посудомоечные машины, Стиральные машины, Телевизоры, Холодильники (2)
+--   Мелкая техника (1)  -> Кухонная техника, Микроволновые печи, Пылесосы, Чайники (2)
 
 
 -- ---- 9.3. STRING_AGG -------------------------------------------------------
@@ -120,7 +128,7 @@ JOIN order_items oi ON oi.order_id = o.id
 JOIN products p     ON p.id = oi.product_id
 GROUP BY o.id
 ORDER BY o.id;
--- 19 строк (у заказа 20 позиций нет, INNER JOIN его исключает)
+-- 59 строк (у заказа 20 позиций нет, INNER JOIN его исключает)
 
 
 -- ---- 9.4. UPSERT -----------------------------------------------------------
@@ -140,7 +148,8 @@ INSERT INTO customers (email, password_hash, name, phone)
 VALUES ('new.client@gmail.com', 'hash', 'Новый Клиент', NULL)
 ON CONFLICT (email) DO UPDATE SET phone = EXCLUDED.phone
 RETURNING id, email;
--- 1 строка: id 11 — вставка
+-- 1 строка: id 32 — вставка. Не 31: первый UPSERT тоже взял число из счётчика
+-- id (до проверки конфликта), и оно «сгорело». Пропуски в SERIAL — это нормально.
 -- MySQL: INSERT ... ON DUPLICATE KEY UPDATE phone = VALUES(phone)
 
 ROLLBACK;
@@ -148,10 +157,10 @@ ROLLBACK;
 
 -- ---- 9.5. LIMIT / OFFSET — пагинация ---------------------------------------
 
--- Задание 9.5: страницы по 10 товаров
-SELECT id, name, price FROM products ORDER BY id LIMIT 10 OFFSET 0;    -- страница 1: 10 строк
-SELECT id, name, price FROM products ORDER BY id LIMIT 10 OFFSET 10;   -- страница 2: 10 строк
-SELECT id, name, price FROM products ORDER BY id LIMIT 10 OFFSET 20;   -- страница 3: 5 строк (21–25)
+-- Задание 9.5: страницы по 10 товаров (60 товаров = 6 страниц)
+SELECT id, name, price FROM products ORDER BY id LIMIT 10 OFFSET 0;    -- страница 1: id 1–10
+SELECT id, name, price FROM products ORDER BY id LIMIT 10 OFFSET 10;   -- страница 2: id 11–20
+SELECT id, name, price FROM products ORDER BY id LIMIT 10 OFFSET 20;   -- страница 3: id 21–30
 
 -- ❓ Keyset-пагинация: вместо «пропусти N строк» — «дай строки после последнего id».
 -- Индекс по id сразу находит место старта, ничего не пропуская.
@@ -159,7 +168,7 @@ SELECT id, name, price FROM products
 WHERE id > 20            -- 20 = id последней строки предыдущей страницы
 ORDER BY id
 LIMIT 10;
--- 5 строк — та же страница 3
+-- 10 строк (id 21–30) — та же страница 3
 
 
 -- ---- 9.6. Типы и приведение ------------------------------------------------
@@ -284,19 +293,24 @@ JOIN orders o ON o.customer_id = c.id
 WHERE o.status = 'delivered'
 GROUP BY c.name;
 /*
-  Примерный план и что значит каждая строка (читать снизу вверх, от вложенных узлов):
+  План с проверочного прогона и что значит каждая строка
+  (читать снизу вверх: сначала выполняются самые вложенные узлы):
 
-  HashAggregate  (cost=... rows=...) (actual time=... rows=8 loops=1)
-    Group Key: c.name                      <- GROUP BY: группировка через хэш-таблицу
-    ->  Hash Join  (...)                   <- соединение двух таблиц по хэшу
-          Hash Cond: (o.customer_id = c.id)   <- условие JOIN
-          ->  Seq Scan on orders o            <- полный просмотр orders (20 строк — индекс не нужен)
-                Filter: (status = 'delivered')   <- WHERE применяется при чтении
-                Rows Removed by Filter: 8        <- 20 заказов − 12 доставленных
-          ->  Hash                            <- из customers строится хэш-таблица
-                ->  Seq Scan on customers c   <- полный просмотр customers
-  Planning Time: ...   <- время на выбор плана
-  Execution Time: ...  <- реальное время выполнения
+  HashAggregate  (cost=3.72..4.02 rows=30) (actual time=0.060..0.064 rows=25 loops=1)
+    Group Key: c.name                       <- GROUP BY: группировка через хэш-таблицу, 25 групп
+    ->  Hash Join  (actual ... rows=37)     <- соединение двух таблиц по хэшу
+          Hash Cond: (o.customer_id = c.id) <- условие JOIN
+          ->  Seq Scan on orders o          <- полный просмотр orders (60 строк — индекс не нужен)
+                Filter: (status = 'delivered')  <- WHERE применяется при чтении
+                Rows Removed by Filter: 23      <- 60 заказов − 37 доставленных
+          ->  Hash                          <- из customers строится хэш-таблица в памяти
+                ->  Seq Scan on customers c <- полный просмотр customers (30 строк)
+  Planning Time: 0.318 ms   <- время на выбор плана
+  Execution Time: 0.125 ms  <- реальное время выполнения
+
+  Если статистика ещё не собрана, вместо HashAggregate можно увидеть
+  GroupAggregate + Sort (сначала сортировка по c.name, потом группировка),
+  а оценка rows будет сильно отличаться от actual rows.
 
   cost=a..b — оценка планировщика (a — до первой строки, b — до последней) в условных единицах;
   rows — ожидаемое число строк; actual time и actual rows — что было на самом деле.
