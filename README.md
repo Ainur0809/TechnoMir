@@ -446,7 +446,7 @@ docker exec technomir_db psql -U postgres -c "CREATE DATABASE shop_copy;"
 docker exec -i technomir_db psql -U postgres -d shop_copy < shop_backup.sql
 ```
 
-<!-- TODO: скриншот успешного восстановления в shop_copy (\dt и COUNT(*) по products) -->
+![Восстановление дампа в shop_copy](docs/backup_restore.png)
 
 ### 7.3 ❓ Чем логический дамп отличается от физического бэкапа
 

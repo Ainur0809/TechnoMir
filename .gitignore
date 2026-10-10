@@ -24,3 +24,7 @@ build/
 # Environment
 .env
 .env.local
+
+# Database dumps (part 7.3)
+shop_backup.sql
+*_backup.sql
