@@ -479,7 +479,7 @@ docker exec -i technomir_db psql -U postgres -d shop_copy < shop_backup.sql
 
 Разбор — в [injection.md](injection.md).
 
-<!-- TODO: часть 8 -->
+Код — в папке [part8_injection/](part8_injection/): уязвимая версия (`VulnerableDao.java`) и защищённая на `PreparedStatement` (`SecureDao.java`), запуск — `run.sh`.
 
 ---
 
