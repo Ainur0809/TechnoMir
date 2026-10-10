@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 250" font-family="Helvetica, Arial, sans-serif">
+  <!-- Круги Эйлера для INNER / LEFT / RIGHT / FULL JOIN (задание 4.3.21).
+       A — левая таблица (customers), B — правая (orders). Закрашено то, что попадает в результат. -->
+  <defs>
+    <circle id="a" cx="70" cy="100" r="55"/>
+    <circle id="b" cx="140" cy="100" r="55"/>
+    <clipPath id="clipA"><use href="#a"/></clipPath>
+    <clipPath id="clipB"><use href="#b"/></clipPath>
+    <mask id="notB"><rect x="0" y="0" width="220" height="220" fill="#fff"/><use href="#b" fill="#000"/></mask>
+  </defs>
+  <rect width="1100" height="250" fill="#ffffff"/>
+
+  <!-- INNER JOIN: только пересечение -->
+  <g transform="translate(10,20)">
+    <use href="#b" fill="#4f7cc4" clip-path="url(#clipA)"/>
+    <use href="#a" fill="none" stroke="#333" stroke-width="2"/>
+    <use href="#b" fill="none" stroke="#333" stroke-width="2"/>
+    <text x="70" y="104" text-anchor="middle" font-size="14" fill="#333">A</text>
+    <text x="140" y="104" text-anchor="middle" font-size="14" fill="#333">B</text>
+    <text x="105" y="185" text-anchor="middle" font-size="16" font-weight="bold" fill="#222">INNER JOIN</text>
+    <text x="105" y="205" text-anchor="middle" font-size="12" fill="#555">только совпавшие строки</text>
+  </g>
+
+  <!-- LEFT JOIN: вся A -->
+  <g transform="translate(230,20)">
+    <use href="#a" fill="#4f7cc4"/>
+    <use href="#a" fill="none" stroke="#333" stroke-width="2"/>
+    <use href="#b" fill="none" stroke="#333" stroke-width="2"/>
+    <text x="55" y="104" text-anchor="middle" font-size="14" fill="#fff">A</text>
+    <text x="155" y="104" text-anchor="middle" font-size="14" fill="#333">B</text>
+    <text x="105" y="185" text-anchor="middle" font-size="16" font-weight="bold" fill="#222">LEFT JOIN</text>
+    <text x="105" y="205" text-anchor="middle" font-size="12" fill="#555">вся A + совпавшие из B</text>
+  </g>
+
+  <!-- RIGHT JOIN: вся B -->
+  <g transform="translate(450,20)">
+    <use href="#b" fill="#4f7cc4"/>
+    <use href="#a" fill="none" stroke="#333" stroke-width="2"/>
+    <use href="#b" fill="none" stroke="#333" stroke-width="2"/>
+    <text x="55" y="104" text-anchor="middle" font-size="14" fill="#333">A</text>
+    <text x="155" y="104" text-anchor="middle" font-size="14" fill="#fff">B</text>
+    <text x="105" y="185" text-anchor="middle" font-size="16" font-weight="bold" fill="#222">RIGHT JOIN</text>
+    <text x="105" y="205" text-anchor="middle" font-size="12" fill="#555">вся B + совпавшие из A</text>
+  </g>
+
+  <!-- FULL JOIN: обе -->
+  <g transform="translate(670,20)">
+    <use href="#a" fill="#4f7cc4"/>
+    <use href="#b" fill="#4f7cc4"/>
+    <use href="#a" fill="none" stroke="#333" stroke-width="2"/>
+    <use href="#b" fill="none" stroke="#333" stroke-width="2"/>
+    <text x="55" y="104" text-anchor="middle" font-size="14" fill="#fff">A</text>
+    <text x="155" y="104" text-anchor="middle" font-size="14" fill="#fff">B</text>
+    <text x="105" y="185" text-anchor="middle" font-size="16" font-weight="bold" fill="#222">FULL JOIN</text>
+    <text x="105" y="205" text-anchor="middle" font-size="12" fill="#555">всё из A и всё из B</text>
+  </g>
+
+  <!-- Только A: LEFT JOIN ... WHERE B.id IS NULL -->
+  <g transform="translate(890,20)">
+    <use href="#a" fill="#c4554f" mask="url(#notB)"/>
+    <use href="#a" fill="none" stroke="#333" stroke-width="2"/>
+    <use href="#b" fill="none" stroke="#333" stroke-width="2"/>
+    <text x="55" y="104" text-anchor="middle" font-size="14" fill="#fff">A</text>
+    <text x="155" y="104" text-anchor="middle" font-size="14" fill="#333">B</text>
+    <text x="105" y="185" text-anchor="middle" font-size="16" font-weight="bold" fill="#222">Только A</text>
+    <text x="105" y="205" text-anchor="middle" font-size="12" fill="#555">LEFT JOIN … WHERE B.id IS NULL</text>
+  </g>
+</svg>
