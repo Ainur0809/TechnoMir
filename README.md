@@ -374,10 +374,12 @@ SELECT tablename, indexname FROM pg_indexes WHERE schemaname = 'public' ORDER BY
 
 ```
 ERROR: deadlock detected
-DETAIL: Process 534 waits for ShareLock on transaction 953; blocked by process 536.
-        Process 536 waits for ShareLock on transaction 952; blocked by process 534.
+DETAIL: Process 457 waits for ShareLock on transaction 974; blocked by process 455.
+        Process 455 waits for ShareLock on transaction 975; blocked by process 457.
 HINT: See server log for query details.
 ```
+
+![Ошибка deadlock detected в DBeaver](docs/deadlock.png)
 
 PostgreSQL откатил транзакцию той сессии, которая получила ошибку. Вторая сразу получила блокировку и продолжила работу. «Жертвой» становится сессия, которая обнаружила цикл: та, что ждёт дольше `deadlock_timeout` в момент, когда цикл уже замкнулся. При ручном выполнении шагов это обычно сессия 2.
 
@@ -419,6 +421,14 @@ PostgreSQL откатил транзакцию той сессии, котора
 
 На `REPEATABLE READ` транзакция видит снимок данных, сделанный при первом запросе, и изменения других транзакций до своего конца не видит. После `COMMIT` сессия 1 видит 9 990.
 
+**READ COMMITTED:** слева окно 1 — повторный `SELECT` в той же транзакции вернул 9 990; справа окно 2 — `UPDATE` до 9 990.
+
+![Non-repeatable read на READ COMMITTED](docs/read_committed.png)
+
+**REPEATABLE READ:** повторный `SELECT` в окне 1 после `UPDATE` в окне 2 по-прежнему возвращает 8 990.
+
+![REPEATABLE READ: аномалии нет](docs/repeatable_read.png)
+
 ---
 
 ## Часть 7. Views, процедуры, обслуживание
@@ -445,6 +455,8 @@ docker exec technomir_db pg_dump -U postgres shop > shop_backup.sql
 docker exec technomir_db psql -U postgres -c "CREATE DATABASE shop_copy;"
 docker exec -i technomir_db psql -U postgres -d shop_copy < shop_backup.sql
 ```
+
+Результат восстановления: в `shop_copy` 11 таблиц и 60 товаров — как в исходной базе.
 
 ![Восстановление дампа в shop_copy](docs/backup_restore.png)
 
