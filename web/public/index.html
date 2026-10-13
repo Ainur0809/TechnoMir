@@ -1,0 +1,1400 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ТехноМир</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Unbounded:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #EEF2F1;
+  --panel: #FFFFFF;
+  --tint: #E4EBE9;
+  --ink: #17231F;
+  --ink-2: #51625C;
+  --ink-3: #82918C;
+  --line: #D3DCD9;
+  --go: #00843D;
+  --go-ink: #006A31;
+  --go-soft: #E2F2E8;
+  --warn: #9A5B00;
+  --warn-soft: #FFF2D6;
+  --danger: #B9302A;
+  --danger-soft: #FBE6E4;
+  --e-app: #00843D;
+  --e-ap: #4EA72E;
+  --e-a: #B7CB1A;
+  --e-b: #FFE01B;
+  --e-c: #F6A81C;
+  --log-bg: #18231F;
+  --log-ink: #D7E2DE;
+  --log-dim: #8AA09A;
+  --log-line: #2C3B36;
+  --log-tx: #F6C445;
+  --log-ok: #74D292;
+  --log-err: #FF7A6E;
+  --r-s: 6px;
+  --r-m: 10px;
+  --font: "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --display: "Unbounded", "Golos Text", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  --journal-h: 46px;
+  --jh: var(--journal-h);
+}
+:root.jopen { --jh: min(46vh, 460px); }
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 15px/1.5 var(--font);
+  padding-bottom: var(--jh);
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--go); outline-offset: 2px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+h1, h2, h3 { margin: 0; font-weight: 600; }
+
+/* ---------- кнопки и поля ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 40px; padding: 0 16px; border-radius: var(--r-s);
+  border: 1px solid var(--line); background: var(--panel); font-weight: 500;
+  white-space: nowrap;
+}
+.btn:hover { border-color: var(--ink-3); }
+.btn.primary { background: var(--go); border-color: var(--go); color: #fff; }
+.btn.primary:hover { background: var(--go-ink); }
+.btn.ghost { border-color: transparent; background: transparent; }
+.btn.ghost:hover { background: var(--tint); }
+.btn.danger { color: var(--danger); }
+.btn.danger:hover { border-color: var(--danger); }
+.btn.small { min-height: 32px; padding: 0 10px; font-size: 14px; }
+.btn[disabled] { opacity: .5; cursor: not-allowed; }
+.field {
+  height: 40px; padding: 0 12px; border: 1px solid var(--line);
+  border-radius: var(--r-s); background: var(--panel); min-width: 0;
+}
+textarea.field { height: auto; padding: 10px 12px; resize: vertical; }
+.field:focus { border-color: var(--go); outline: none; box-shadow: 0 0 0 3px var(--go-soft); }
+label.check { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+label.check input { accent-color: var(--go); width: 16px; height: 16px; }
+
+/* ---------- шапка ---------- */
+.top {
+  background: var(--panel); border-bottom: 1px solid var(--line);
+  position: sticky; top: 0; z-index: 20;
+}
+.top-in {
+  max-width: 1320px; margin: 0 auto; padding: 12px 24px;
+  display: grid; grid-template-columns: auto 1fr auto; gap: 24px; align-items: center;
+}
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
+.logo-mark { display: grid; gap: 2px; width: 26px; }
+.logo-mark i { display: block; height: 4px; border-radius: 0 2px 2px 0; }
+.logo-mark i:nth-child(1) { width: 14px; background: var(--e-app); }
+.logo-mark i:nth-child(2) { width: 18px; background: var(--e-ap); }
+.logo-mark i:nth-child(3) { width: 21px; background: var(--e-a); }
+.logo-mark i:nth-child(4) { width: 24px; background: var(--e-b); }
+.logo-mark i:nth-child(5) { width: 26px; background: var(--e-c); }
+.logo b { font: 700 21px/1 var(--display); letter-spacing: -.01em; }
+.search { position: relative; max-width: 560px; width: 100%; }
+.search .field { width: 100%; padding-left: 40px; height: 44px; background: var(--bg); border-color: transparent; }
+.search .field:focus { background: var(--panel); }
+.search svg { position: absolute; left: 12px; top: 12px; color: var(--ink-3); }
+.top-right { display: flex; align-items: center; gap: 12px; }
+.who { display: flex; flex-direction: column; font-size: 12px; color: var(--ink-3); }
+.who select { border: 0; background: transparent; font-weight: 600; font-size: 14px; color: var(--ink); padding: 0; max-width: 210px; cursor: pointer; }
+.cart-btn { position: relative; }
+.cart-btn .count {
+  min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px;
+  background: var(--go); color: #fff; font-size: 12px; font-weight: 600;
+  display: inline-grid; place-items: center;
+}
+.cart-btn .count:empty { display: none; }
+
+.nav { max-width: 1320px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; gap: 4px; }
+.tab {
+  border: 0; background: none; padding: 10px 14px 12px; font-weight: 500; color: var(--ink-2);
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); }
+.dbpill {
+  margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-2);
+  padding: 4px 10px; border-radius: 20px; background: var(--bg);
+}
+.dbpill .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-3); }
+.dbpill.ok .dot { background: var(--go); }
+.dbpill.down .dot { background: var(--danger); }
+.dbpill b { font-weight: 600; color: var(--ink); }
+
+/* ---------- страница ---------- */
+main { max-width: 1320px; margin: 0 auto; padding: 24px; }
+.view[hidden] { display: none !important; }
+
+.promo {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  padding: 18px 22px; border-radius: var(--r-m); background: var(--ink); color: #fff; margin-bottom: 24px;
+}
+.promo h1 { font: 500 20px/1.25 var(--display); max-width: 34ch; }
+.promo p { margin: 4px 0 0; color: #B8C7C2; font-size: 14px; }
+.promo code {
+  font: 500 15px var(--mono); background: #fff; color: var(--ink); padding: 8px 14px; border-radius: var(--r-s);
+  border: 1px dashed transparent; cursor: pointer;
+}
+
+.catalog { display: grid; grid-template-columns: 250px 1fr; gap: 28px; align-items: start; }
+.filters { position: sticky; top: 128px; display: grid; gap: 24px; max-height: calc(100vh - 190px); overflow: auto; padding-right: 4px; }
+.filters h2 { font-size: 13px; color: var(--ink-3); font-weight: 600; margin-bottom: 8px; }
+.cats { list-style: none; margin: 0; padding: 0; }
+.cats button {
+  width: 100%; display: flex; justify-content: space-between; gap: 8px; text-align: left;
+  border: 0; background: none; padding: 6px 10px; border-radius: var(--r-s); color: var(--ink-2);
+}
+.cats button:hover { background: var(--tint); }
+.cats button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.cats button[aria-pressed="true"] span:last-child { color: #B8C7C2; }
+.cats .root { font-weight: 600; color: var(--ink); }
+.cats .lvl2 { padding-left: 24px; }
+.cats span:last-child { color: var(--ink-3); font-size: 13px; }
+.brands { display: grid; gap: 6px; }
+.brands label span { color: var(--ink-3); font-size: 13px; margin-left: auto; }
+.energy-pick { display: grid; gap: 4px; }
+.energy-pick button {
+  border: 0; padding: 0; background: none; display: flex; align-items: center; gap: 10px; text-align: left; color: var(--ink-2);
+}
+.energy-pick button .chev { opacity: .45; }
+.energy-pick button[aria-pressed="true"] .chev { opacity: 1; box-shadow: 0 0 0 2px var(--ink) inset; }
+.energy-pick button[aria-pressed="true"] { color: var(--ink); font-weight: 600; }
+
+/* стрелка класса энергопотребления — как на наклейке у техники */
+.chev {
+  --c: var(--e-a);
+  display: inline-flex; align-items: center; height: 24px; padding: 0 16px 0 9px;
+  background: var(--c); color: #fff; font: 700 13px/1 var(--display); letter-spacing: .02em;
+  clip-path: polygon(0 0, calc(100% - 11px) 0, 100% 50%, calc(100% - 11px) 100%, 0 100%);
+  border-radius: 3px 0 0 3px; white-space: nowrap;
+}
+.chev[data-c="A++"] { --c: var(--e-app); }
+.chev[data-c="A+"]  { --c: var(--e-ap); }
+.chev[data-c="A"]   { --c: var(--e-a); color: #2B3300; }
+.chev[data-c="B"]   { --c: var(--e-b); color: #3B3400; }
+.chev[data-c="C"]   { --c: var(--e-c); color: #3E2700; }
+.energy-pick .chev { width: var(--w); }
+
+.grid-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+.grid-head h2 { font: 500 24px/1.2 var(--display); }
+.grid-head .muted { color: var(--ink-3); margin-left: 10px; font-size: 15px; font-family: var(--font); }
+.grid-head select { height: 36px; }
+.mobile-filters { display: none; }
+.products { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
+.card {
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-m);
+  display: flex; flex-direction: column; overflow: hidden; position: relative;
+}
+.card:hover { border-color: var(--ink-3); }
+.card .pic {
+  border: 0; padding: 0; background: var(--tint); aspect-ratio: 4 / 3; display: grid; place-items: center;
+  color: var(--ink-2); width: 100%;
+}
+.card .pic svg { width: 44%; height: auto; }
+.card .chev { position: absolute; top: 14px; left: 0; border-radius: 0; }
+.card .body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.card .meta { font-size: 13px; color: var(--ink-3); }
+.card h3 { font-size: 16px; line-height: 1.3; font-weight: 600; }
+.card h3 button { border: 0; background: none; padding: 0; text-align: left; font-weight: 600; }
+.card h3 button:hover { color: var(--go-ink); text-decoration: underline; text-underline-offset: 3px; }
+.stars { color: #E2A100; letter-spacing: 1px; font-size: 14px; }
+.stars .off { color: var(--line); }
+.rating { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-3); }
+.price { font: 600 21px/1.2 var(--font); margin-top: auto; padding-top: 6px; }
+.stock { font-size: 13px; }
+.stock.ok { color: var(--go-ink); }
+.stock.low { color: var(--warn); }
+.stock.none { color: var(--ink-3); }
+.card .actions { margin-top: 8px; }
+.card .actions .btn { width: 100%; }
+.stepper { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: var(--r-s); height: 40px; background: var(--panel); }
+.stepper button { border: 0; background: none; width: 36px; height: 100%; font-size: 18px; color: var(--ink-2); }
+.stepper button:hover { color: var(--ink); background: var(--tint); }
+.stepper input { width: 44px; border: 0; text-align: center; font-weight: 600; background: none; -moz-appearance: textfield; }
+.stepper input::-webkit-inner-spin-button { -webkit-appearance: none; }
+.card .stepper { width: 100%; justify-content: space-between; }
+.empty { padding: 48px 24px; text-align: center; color: var(--ink-2); background: var(--panel); border: 1px dashed var(--line); border-radius: var(--r-m); }
+.empty b { display: block; color: var(--ink); font-size: 17px; margin-bottom: 4px; }
+
+/* ---------- боковые панели ---------- */
+.scrim { position: fixed; inset: 0 0 var(--jh) 0; background: rgba(23, 35, 31, .38); z-index: 40; }
+.sheet {
+  position: fixed; top: 0; right: 0; bottom: var(--jh); width: min(560px, 100%); z-index: 41;
+  background: var(--panel); display: flex; flex-direction: column;
+  transform: translateX(100%); transition: transform .22s ease, bottom .2s ease;
+}
+.sheet.open { transform: none; }
+.sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--line); }
+.sheet-head h2 { font: 500 18px/1.3 var(--display); }
+.sheet-body { padding: 20px; overflow: auto; flex: 1; display: grid; gap: 24px; align-content: start; }
+.sheet-foot { padding: 16px 20px; border-top: 1px solid var(--line); display: grid; gap: 12px; }
+.x { width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--bg); display: grid; place-items: center; }
+
+.pd-top { display: grid; grid-template-columns: 160px 1fr; gap: 20px; align-items: start; }
+.pd-pic { background: var(--tint); border-radius: var(--r-m); aspect-ratio: 1; display: grid; place-items: center; color: var(--ink-2); position: relative; }
+.pd-pic svg { width: 60%; }
+.pd-top h3 { font: 500 20px/1.3 var(--display); margin: 8px 0 4px; }
+.pd-top .meta { color: var(--ink-3); font-size: 14px; }
+.pd-buy { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.pd-buy .price { font-size: 26px; padding: 0; margin: 0 auto 0 0; }
+.hint { font-size: 13px; color: var(--ink-3); margin: 0; }
+.section h4 { font-size: 15px; margin: 0 0 10px; font-weight: 600; }
+.specs { width: 100%; border-collapse: collapse; font-size: 14px; }
+.specs th { text-align: left; font-weight: 400; color: var(--ink-2); padding: 7px 12px 7px 0; width: 44%; border-bottom: 1px solid var(--bg); vertical-align: top; }
+.specs td { padding: 7px 0; border-bottom: 1px solid var(--bg); }
+.review { padding: 12px 0; border-bottom: 1px solid var(--bg); }
+.review header { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
+.review p { margin: 6px 0 0; font-size: 14px; color: var(--ink-2); }
+.review time { color: var(--ink-3); font-size: 13px; }
+.review-form { display: grid; gap: 10px; background: var(--bg); padding: 14px; border-radius: var(--r-m); }
+.star-input { display: flex; gap: 2px; }
+.star-input button { border: 0; background: none; font-size: 26px; line-height: 1; color: var(--line); padding: 0 2px; }
+.star-input button.on { color: #E2A100; }
+
+.line-item { display: grid; grid-template-columns: 56px 1fr auto; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--bg); }
+.line-item .ico { width: 56px; height: 56px; border-radius: var(--r-s); background: var(--tint); display: grid; place-items: center; color: var(--ink-2); }
+.line-item .ico svg { width: 34px; }
+.line-item .name { font-weight: 500; font-size: 14px; line-height: 1.35; }
+.line-item .sub { font-size: 13px; color: var(--ink-3); }
+.line-item .right { display: grid; justify-items: end; gap: 6px; }
+.line-item .stepper { height: 32px; }
+.line-item .stepper button { width: 28px; }
+.line-item .stepper input { width: 34px; }
+.choice { display: grid; gap: 8px; }
+.choice label {
+  display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border: 1px solid var(--line);
+  border-radius: var(--r-s); cursor: pointer; font-size: 14px;
+}
+.choice label:has(input:checked) { border-color: var(--go); background: var(--go-soft); }
+.choice input { accent-color: var(--go); margin-top: 3px; }
+.choice small { display: block; color: var(--ink-3); }
+.totals { display: grid; gap: 4px; font-size: 14px; }
+.totals div { display: flex; justify-content: space-between; }
+.totals .grand { font-size: 18px; font-weight: 600; padding-top: 6px; }
+.promo-row { display: flex; gap: 8px; }
+.promo-row .field { flex: 1; }
+
+/* ---------- заказы ---------- */
+.page-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+.page-head h2 { font: 500 24px/1.2 var(--display); }
+.page-head p { margin: 4px 0 0; color: var(--ink-2); }
+.orders { display: grid; gap: 14px; max-width: 900px; }
+.order { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-m); padding: 18px 20px; }
+.order.fresh { border-color: var(--go); box-shadow: 0 0 0 3px var(--go-soft); }
+.order-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.order-head h3 { font-size: 17px; }
+.order-head .when { color: var(--ink-3); font-size: 14px; }
+.order-head .sum { margin-left: auto; font-weight: 600; font-size: 17px; }
+.status { font-size: 13px; font-weight: 600; padding: 3px 9px; border-radius: 20px; background: var(--bg); color: var(--ink-2); }
+.status.new { background: #E4EEFB; color: #1F5296; }
+.status.paid { background: var(--go-soft); color: var(--go-ink); }
+.status.shipped { background: var(--warn-soft); color: var(--warn); }
+.status.delivered { background: var(--tint); color: var(--ink); }
+.status.cancelled { background: var(--danger-soft); color: var(--danger); }
+.order .addr { color: var(--ink-2); font-size: 14px; margin: 6px 0 10px; }
+.order-items { list-style: none; margin: 0; padding: 0; font-size: 14px; }
+.order-items li { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-top: 1px solid var(--bg); }
+.order-items li span:last-child { color: var(--ink-2); white-space: nowrap; }
+.order-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 12px; font-size: 14px; color: var(--ink-2); flex-wrap: wrap; }
+
+/* ---------- управление ---------- */
+.admin { display: grid; gap: 28px; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-m); }
+.panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.panel-head h3 { font-size: 17px; }
+.panel-head p { margin: 2px 0 0; font-size: 13px; color: var(--ink-3); }
+.counts { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.counts div { padding: 14px 20px; border-right: 1px solid var(--bg); border-bottom: 1px solid var(--bg); }
+.counts code { font: 13px var(--mono); color: var(--ink-2); }
+.counts b { display: flex; align-items: baseline; gap: 8px; font-size: 22px; font-weight: 600; }
+.delta { font-size: 13px; font-weight: 600; padding: 1px 6px; border-radius: 10px; }
+.delta.up { background: var(--go-soft); color: var(--go-ink); }
+.delta.down { background: var(--danger-soft); color: var(--danger); }
+.table-wrap { overflow: auto; max-height: 520px; }
+table.data { width: 100%; border-collapse: collapse; font-size: 14px; }
+table.data th { position: sticky; top: 0; background: var(--panel); text-align: left; font-weight: 500; color: var(--ink-3); padding: 10px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; z-index: 1; }
+table.data td { padding: 8px 12px; border-bottom: 1px solid var(--bg); vertical-align: middle; }
+table.data td.num, table.data th.num { text-align: right; white-space: nowrap; }
+table.data tr.flash td { background: var(--go-soft); }
+table.data .field { height: 34px; width: 110px; }
+table.data select.field { width: 130px; }
+.row-actions { display: flex; gap: 6px; justify-content: flex-end; }
+.new-product { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; padding: 16px 20px; border-bottom: 1px solid var(--line); background: var(--bg); }
+.new-product label { display: grid; gap: 4px; font-size: 13px; color: var(--ink-2); }
+.new-product .wide { grid-column: span 2; }
+.new-product .go { align-self: end; }
+
+/* ---------- журнал SQL ---------- */
+.journal {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; background: var(--log-bg); color: var(--log-ink);
+  height: var(--journal-h); transition: height .2s ease; display: flex; flex-direction: column;
+}
+.journal.open { height: var(--jh); }
+.journal-bar { display: flex; align-items: center; gap: 14px; height: var(--journal-h); padding: 0 20px; flex-shrink: 0; }
+.journal-bar button.toggle { border: 0; background: none; color: inherit; display: flex; align-items: center; gap: 10px; font-weight: 600; height: 100%; padding: 0; }
+.journal-bar .chevron { transition: transform .2s; }
+.journal.open .chevron { transform: rotate(180deg); }
+.journal-bar .last { font: 13px var(--mono); color: var(--log-dim); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; flex: 1; }
+.journal-bar .clear { border: 1px solid var(--log-line); background: none; color: var(--log-dim); border-radius: var(--r-s); padding: 4px 10px; font-size: 13px; }
+.journal-list { overflow: auto; padding: 0 20px 20px; display: flex; flex-direction: column; gap: 14px; flex: 1; min-height: 0; }
+.jgroup { border: 1px solid var(--log-line); border-radius: var(--r-m); overflow: hidden; flex-shrink: 0; }
+.jgroup header { display: flex; gap: 10px; align-items: center; padding: 8px 12px; background: #1F2D29; font-size: 14px; flex-wrap: wrap; }
+.jgroup header b { font-weight: 600; }
+.jgroup header .http { font: 12px var(--mono); color: var(--log-dim); }
+.jgroup header time { margin-left: auto; font: 12px var(--mono); color: var(--log-dim); }
+.jgroup .why { padding: 8px 12px; font-size: 14px; color: #FFD1CC; background: #3A2220; border-top: 1px solid var(--log-line); }
+.jstmt { border-top: 1px solid var(--log-line); padding: 10px 12px; display: grid; gap: 6px; }
+.jstmt pre { margin: 0; font: 13px/1.55 var(--mono); white-space: pre-wrap; word-break: break-word; }
+.jstmt .kw { color: #8EC5FF; }
+.jstmt .str { color: #F2B880; }
+.jstmt .num { color: #C7A6FF; }
+.jstmt .info { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; font: 12px var(--mono); color: var(--log-dim); }
+.jstmt .info .res.ok { color: var(--log-ok); }
+.jstmt .info .res.error { color: var(--log-err); }
+.jstmt .copy { margin-left: auto; border: 1px solid var(--log-line); background: none; color: var(--log-dim); border-radius: 4px; font-size: 12px; padding: 2px 8px; }
+.jstmt .copy:hover { color: var(--log-ink); }
+.jstmt.tx pre { color: var(--log-tx); font-weight: 500; }
+.jstmt.rollback pre { color: var(--log-err); font-weight: 500; }
+.journal-empty { color: var(--log-dim); font-size: 14px; padding: 8px 0; }
+
+/* ---------- уведомления и подтверждение ---------- */
+.toasts { position: fixed; bottom: calc(var(--jh) + 16px); left: 16px; z-index: 70; display: grid; gap: 10px; width: min(400px, calc(100% - 32px)); }
+.toast { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--go); border-radius: var(--r-s); padding: 12px 14px; font-size: 14px; box-shadow: 0 6px 24px rgba(23, 35, 31, .14); }
+.toast b { display: block; margin-bottom: 2px; }
+.toast.error { border-left-color: var(--danger); }
+.toast.error b { color: var(--danger); }
+.modal { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; background: rgba(23, 35, 31, .45); padding: 16px; }
+.modal[hidden] { display: none; }
+.modal-box { background: var(--panel); border-radius: var(--r-m); padding: 22px; width: min(440px, 100%); display: grid; gap: 14px; }
+.modal-box h3 { font-size: 18px; }
+.modal-box p { margin: 0; color: var(--ink-2); }
+.modal-box .row { display: flex; justify-content: flex-end; gap: 10px; }
+
+.offline { margin-bottom: 20px; padding: 14px 18px; border-radius: var(--r-m); background: var(--danger-soft); color: var(--danger); }
+.offline code { font-family: var(--mono); background: #fff; padding: 1px 6px; border-radius: 4px; color: var(--ink); }
+
+@media (max-width: 900px) {
+  .top-in { grid-template-columns: 1fr auto; gap: 12px; padding: 10px 16px; }
+  .search { grid-column: 1 / -1; grid-row: 2; max-width: none; }
+  .who { display: none; }
+  .nav { padding: 0 16px; overflow-x: auto; }
+  .dbpill { display: none; }
+  main { padding: 16px; }
+  .catalog { grid-template-columns: 1fr; }
+  .filters { position: static; max-height: none; display: none; background: var(--panel); padding: 16px; border-radius: var(--r-m); border: 1px solid var(--line); }
+  .filters.show { display: grid; }
+  .mobile-filters { display: inline-flex; }
+  .products { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .card .body { padding: 12px; }
+  .card h3 { font-size: 14px; }
+  .price { font-size: 18px; }
+  .pd-top { grid-template-columns: 1fr; }
+  .pd-pic { max-width: 200px; }
+  .promo h1 { font-size: 17px; }
+  .who-mobile { display: block !important; }
+}
+.who-mobile { display: none; padding: 0 16px 10px; }
+.who-mobile select { width: 100%; }
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <a class="logo" href="#catalog" aria-label="ТехноМир, на главную">
+      <span class="logo-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+      <b>ТехноМир</b>
+    </a>
+    <div class="search">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <label class="sr" for="q">Поиск по каталогу</label>
+      <input id="q" class="field" type="search" placeholder="Холодильник, Bosch, WAN28282OE" autocomplete="off">
+    </div>
+    <div class="top-right">
+      <div class="who">
+        <label for="customer">Покупатель</label>
+        <select id="customer"></select>
+      </div>
+      <button class="btn cart-btn" id="cartBtn" type="button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 4h2l2.4 11.2a1 1 0 0 0 1 .8h9.4a1 1 0 0 0 1-.8L21 8H6.2"/><circle cx="9.5" cy="20" r="1.4"/><circle cx="17.5" cy="20" r="1.4"/></svg>
+        <span>Корзина</span><span class="count" id="cartCount"></span>
+      </button>
+    </div>
+  </div>
+  <div class="who-mobile"><select id="customerMobile" class="field" aria-label="Покупатель"></select></div>
+  <nav class="nav" role="tablist" aria-label="Разделы">
+    <button class="tab" role="tab" data-view="catalog" aria-selected="true">Каталог</button>
+    <button class="tab" role="tab" data-view="orders" aria-selected="false">Мои заказы</button>
+    <button class="tab" role="tab" data-view="admin" aria-selected="false">Управление</button>
+    <div class="dbpill" id="dbpill" title="Сайт работает с этой базой напрямую">
+      <span class="dot"></span><span id="dbtext">Подключаюсь к базе…</span>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <div class="offline" id="offline" hidden></div>
+
+  <!-- ===================== КАТАЛОГ ===================== -->
+  <section class="view" id="view-catalog">
+    <div class="promo">
+      <div>
+        <h1>Минус 1 000 ₽ на любой заказ по промокоду</h1>
+        <p>Введите код в корзине. Скидка попадёт в orders.total, а цены позиций останутся прежними.</p>
+      </div>
+      <code id="promoCode" title="Скопировать промокод">ТЕХНО1000</code>
+    </div>
+
+    <div class="catalog">
+      <aside class="filters" id="filters" aria-label="Фильтры">
+        <div>
+          <h2>Категории</h2>
+          <ul class="cats" id="cats"></ul>
+        </div>
+        <div>
+          <h2>Класс энергопотребления</h2>
+          <div class="energy-pick" id="energy"></div>
+        </div>
+        <div>
+          <h2>Бренды</h2>
+          <div class="brands" id="brands"></div>
+        </div>
+        <label class="check"><input type="checkbox" id="instock"> Только в наличии</label>
+      </aside>
+
+      <div>
+        <div class="grid-head">
+          <h2 id="gridTitle">Все товары<span class="muted" id="gridCount"></span></h2>
+          <div style="display:flex;gap:8px">
+            <button class="btn small mobile-filters" id="filtersBtn" type="button">Фильтры</button>
+            <label class="sr" for="sort">Сортировка</label>
+            <select id="sort" class="field">
+              <option value="popular">Сначала популярные</option>
+              <option value="price_asc">Сначала дешевле</option>
+              <option value="price_desc">Сначала дороже</option>
+              <option value="rating">По рейтингу</option>
+              <option value="new">Новинки</option>
+            </select>
+          </div>
+        </div>
+        <div class="products" id="products"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== ЗАКАЗЫ ===================== -->
+  <section class="view" id="view-orders" hidden>
+    <div class="page-head">
+      <div>
+        <h2>Мои заказы</h2>
+        <p id="ordersWho"></p>
+      </div>
+    </div>
+    <div class="orders" id="orders"></div>
+  </section>
+
+  <!-- ===================== УПРАВЛЕНИЕ ===================== -->
+  <section class="view" id="view-admin" hidden>
+    <div class="page-head">
+      <div>
+        <h2>Управление магазином</h2>
+        <p>Здесь видно, как каждое действие меняет таблицы. Те же числа покажет DBeaver.</p>
+      </div>
+      <button class="btn" id="adminRefresh" type="button">Обновить данные</button>
+    </div>
+    <div class="admin">
+      <div class="panel">
+        <div class="panel-head">
+          <div><h3>Строк в таблицах</h3><p>Изменения с прошлого обновления подсвечены</p></div>
+        </div>
+        <div class="counts" id="counts"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div><h3>Заказы</h3><p>Из view v_order_summary. Статус проверяет CHECK, удаление каскадом уносит позиции и платежи</p></div>
+          <select class="field" id="statusFilter" style="height:36px">
+            <option value="">Все статусы</option>
+            <option value="new">Новые</option>
+            <option value="paid">Оплаченные</option>
+            <option value="shipped">Отправленные</option>
+            <option value="delivered">Доставленные</option>
+            <option value="cancelled">Отменённые</option>
+          </select>
+        </div>
+        <div class="table-wrap"><table class="data" id="adminOrders"></table></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div><h3>Товары и остатки</h3><p>Из view v_product_stats. Отрицательная цена или остаток — ошибка CHECK, товар с продажами не удалить (RESTRICT)</p></div>
+          <button class="btn small" id="newProductBtn" type="button">Добавить товар</button>
+        </div>
+        <form class="new-product" id="newProduct" hidden>
+          <label class="wide">Название<input class="field" name="name" required placeholder="Чайник Bosch"></label>
+          <label>Модель<input class="field" name="model" placeholder="TWK3A011"></label>
+          <label>Цена, ₽<input class="field" name="price" inputmode="decimal" value="2990"></label>
+          <label>Остаток, шт.<input class="field" name="stock" inputmode="numeric" value="5"></label>
+          <label>Бренд<select class="field" name="brandId" id="npBrand"></select></label>
+          <label>Категория<select class="field" name="categoryId" id="npCat"></select></label>
+          <label>Класс<select class="field" name="energyClass"><option value="">—</option><option>A++</option><option>A+</option><option>A</option><option>B</option><option>C</option></select></label>
+          <button class="btn primary go" type="submit">Добавить в каталог</button>
+        </form>
+        <div class="table-wrap"><table class="data" id="adminProducts"></table></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ===================== ПАНЕЛИ ===================== -->
+<div class="scrim" id="scrim" hidden></div>
+
+<aside class="sheet" id="productSheet" aria-hidden="true" aria-labelledby="pdTitle" role="dialog">
+  <div class="sheet-head"><h2 id="pdTitle">Товар</h2><button class="x" data-close aria-label="Закрыть">✕</button></div>
+  <div class="sheet-body" id="pdBody"></div>
+</aside>
+
+<aside class="sheet" id="cartSheet" aria-hidden="true" aria-labelledby="cartTitle" role="dialog">
+  <div class="sheet-head"><h2 id="cartTitle">Корзина</h2><button class="x" data-close aria-label="Закрыть">✕</button></div>
+  <div class="sheet-body" id="cartBody"></div>
+  <div class="sheet-foot" id="cartFoot"></div>
+</aside>
+
+<div class="modal" id="confirm" hidden role="alertdialog" aria-labelledby="confirmTitle">
+  <div class="modal-box">
+    <h3 id="confirmTitle"></h3>
+    <p id="confirmText"></p>
+    <div class="row">
+      <button class="btn" id="confirmNo" type="button">Отмена</button>
+      <button class="btn primary" id="confirmYes" type="button">Удалить</button>
+    </div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<!-- ===================== ЖУРНАЛ SQL ===================== -->
+<section class="journal" id="journal" aria-label="Журнал SQL">
+  <div class="journal-bar">
+    <button class="toggle" id="journalToggle" aria-expanded="false" type="button">
+      <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg>
+      Журнал SQL <span id="journalCount" style="color:var(--log-dim);font-weight:400"></span>
+    </button>
+    <span class="last" id="journalLast">Здесь появятся команды, которые сайт отправил в базу</span>
+    <button class="clear" id="journalClear" type="button">Очистить</button>
+  </div>
+  <div class="journal-list" id="journalList"></div>
+</section>
+
+<script>
+"use strict";
+
+// ================================================================ утилиты
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const rub = v => new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 }).format(Number(v)) + " ₽";
+const dt = v => v ? new Date(v).toLocaleString("ru-RU", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "";
+const plural = (n, a, b, c) => { n = Math.abs(n) % 100; const d = n % 10; return n > 10 && n < 20 ? c : d > 1 && d < 5 ? b : d === 1 ? a : c; };
+const store = {
+  get(k, d) { try { const v = localStorage.getItem("tm:" + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem("tm:" + k, JSON.stringify(v)); } catch { /* приватный режим */ } }
+};
+const STATUS = { new: "Новый", paid: "Оплачен", shipped: "Отправлен", delivered: "Доставлен", cancelled: "Отменён" };
+const PAY = { card: "картой", sbp: "через СБП", cash: "наличными", gift_card: "сертификатом" };
+const ENERGY = ["A++", "A+", "A", "B", "C"];
+
+// ================================================================ иконки категорий
+const I = (d) => `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const ICONS = {
+  3: I('<rect x="12" y="4" width="24" height="40" rx="3"/><path d="M12 18h24M16 10v4M16 23v6"/>'),
+  4: I('<rect x="8" y="5" width="32" height="38" rx="3"/><path d="M8 13h32"/><circle cx="24" cy="28" r="10"/><path d="M18 29c3 2 9 2 12-1"/><circle cx="14" cy="9" r="1"/><circle cx="19" cy="9" r="1"/>'),
+  7: I('<rect x="4" y="8" width="40" height="26" rx="2"/><path d="M18 42h12M24 34v8"/>'),
+  8: I('<rect x="9" y="5" width="30" height="38" rx="3"/><path d="M9 12h30"/><path d="M15 20h18v16H15z"/><path d="M19 25v6M24 25v6M29 25v6"/>'),
+  5: I('<path d="M30 6 18 32"/><circle cx="14" cy="38" r="5"/><path d="M14 33h14a8 8 0 0 1 8 8v1H9"/><path d="M30 6h6"/>'),
+  6: I('<path d="M14 18h20l-2 22H16z"/><path d="M34 22c5 0 6 8 1 10"/><path d="M14 18l-5-6"/><path d="M20 18v-4h8v4"/><path d="M16 40h16"/>'),
+  9: I('<rect x="4" y="10" width="40" height="28" rx="2"/><rect x="9" y="15" width="22" height="18" rx="1"/><path d="M37 16v2M37 22v2M37 28v4"/>'),
+  10: I('<path d="M16 6h16l-3 20H19z"/><path d="M14 26h20l-2 8H16z"/><path d="M18 34h12v8H18z"/><path d="M24 14v6"/>'),
+  0: I('<path d="M17 4v10M31 4v10"/><path d="M12 14h24v8a12 12 0 0 1-24 0z"/><path d="M24 34v10"/>')
+};
+const iconFor = (p) => ICONS[p.category_id] || ICONS[0];
+const stars = (r) => {
+  const n = Math.round(Number(r) || 0);
+  return `<span class="stars" aria-label="Рейтинг ${Number(r || 0).toFixed(1)} из 5">${"★".repeat(n)}<span class="off">${"★".repeat(5 - n)}</span></span>`;
+};
+const stockText = (s) => s <= 0 ? ["none", "Нет в наличии"] : s <= 3 ? ["low", `Осталось ${s} шт.`] : ["ok", `В наличии ${s} шт.`];
+
+// ================================================================ состояние
+const state = {
+  customers: [], categories: [], brands: [], uncategorized: 0,
+  customerId: store.get("customer", 1),
+  cart: store.get("cart", []),          // [{id, name, model, price, stock, category_id, qty}]
+  filters: { category: "", brands: [], energy: [], q: "", instock: false, sort: "popular" },
+  view: "catalog",
+  addresses: [], products: [],
+  lastCounts: null, freshOrder: null, adminProducts: []
+};
+
+// ================================================================ API + журнал
+let journalCount = 0;
+async function api(method, path, body, label, { silent = false } = {}) {
+  let res, json;
+  try {
+    res = await fetch(path, {
+      method, headers: body ? { "Content-Type": "application/json" } : {},
+      body: body ? JSON.stringify(body) : undefined
+    });
+    json = await res.json();
+  } catch (e) {
+    setOffline("Сайт не отвечает. Проверьте, что в терминале запущен <code>./run.sh</code>.");
+    throw new Error("Сайт не отвечает: сервер ./run.sh остановлен.");
+  }
+  if (!silent || !res.ok) logGroup(label, method, path, res.status, json);
+  if (res.status === 503) setOffline(esc(json.error).replace("docker compose up -d", "<code>docker compose up -d</code>"));
+  else if (res.ok) setOffline(null);
+  if (!res.ok) { const err = new Error(json.error || "Ошибка"); err.status = res.status; err.detail = json.detail; throw err; }
+  return json.data;
+}
+
+function setOffline(html) {
+  const el = $("#offline");
+  el.hidden = !html;
+  if (html) el.innerHTML = html;
+}
+
+const KW = /\b(SELECT|FROM|WHERE|AND|OR|NOT|IN|IS|NULL|DISTINCT|JOIN|LEFT|ON|AS|ORDER|BY|GROUP|LIMIT|INSERT|INTO|VALUES|RETURNING|UPDATE|SET|DELETE|WITH|RECURSIVE|UNION|ALL|COUNT|SUM|COALESCE|EXISTS|FOR|ILIKE|ASC|DESC|BEGIN|COMMIT|ROLLBACK|CASE|WHEN|THEN|ELSE|END)\b/g;
+function highlight(sql) {
+  return esc(sql)
+    .replace(/(&#39;[^]*?&#39;)/g, '<span class="str">$1</span>')
+    .replace(KW, '<span class="kw">$1</span>')
+    .replace(/(?<![\w.$])(\d+(?:\.\d+)?)(?![\w])/g, '<span class="num">$1</span>');
+}
+
+function logGroup(label, method, path, status, json) {
+  const list = $("#journalList");
+  const stmts = json.sql || [];
+  journalCount += stmts.length;
+  const g = document.createElement("article");
+  g.className = "jgroup";
+  g.innerHTML = `
+    <header>
+      <b>${esc(label || path)}</b>
+      <span class="http">${esc(method)} ${esc(path)} → ${status}</span>
+      <time>${new Date().toLocaleTimeString("ru-RU")}</time>
+    </header>
+    ${json.error ? `<div class="why">${esc(json.error)}${json.detail && json.detail !== json.error ? `<br><small style="opacity:.75">PostgreSQL: ${esc(json.detail)}</small>` : ""}</div>` : ""}
+    ${stmts.map((s, i) => `
+      <div class="jstmt ${esc(s.kind)}">
+        <pre>${s.kind === "tx" || s.kind === "rollback" ? esc(s.sql) : highlight(s.sql)}</pre>
+        ${s.kind === "tx" || s.kind === "rollback" ? "" : `
+        <div class="info">
+          ${s.params && s.params.length ? `<span>параметры: ${s.params.map(p => p == null ? "NULL" : esc(p)).join(", ")}</span>` : ""}
+          <span class="res ${esc(s.kind)}">${esc(s.result)}</span>
+          <span>${esc(s.ms)} мс</span>
+          <button class="copy" data-copy="${i}" type="button">Копировать для DBeaver</button>
+        </div>`}
+      </div>`).join("")}
+    ${!stmts.length && !json.error ? `<div class="jstmt"><div class="info">В базу ничего не отправлялось</div></div>` : ""}`;
+  $$(".copy", g).forEach(b => b.addEventListener("click", async () => {
+    const s = stmts[Number(b.dataset.copy)];
+    try { await navigator.clipboard.writeText(s.inline); b.textContent = "Скопировано"; }
+    catch { b.textContent = "Не удалось скопировать"; }
+    setTimeout(() => { b.textContent = "Копировать для DBeaver"; }, 1500);
+  }));
+  list.prepend(g);
+  while (list.children.length > 60) list.lastElementChild.remove();
+  $("#journalCount").textContent = `· ${journalCount} ${plural(journalCount, "команда", "команды", "команд")}`;
+  const meaningful = [...stmts].reverse().find(s => s.kind !== "ok") || stmts[stmts.length - 1];
+  $("#journalLast").textContent = json.error ? `Ошибка: ${json.error}` : meaningful ? meaningful.sql.split("\n")[0] : "";
+  $("#journalLast").style.color = json.error ? "var(--log-err)" : "";
+}
+
+$("#journalToggle").addEventListener("click", () => {
+  const j = $("#journal");
+  j.classList.toggle("open");
+  document.documentElement.classList.toggle("jopen", j.classList.contains("open"));
+  $("#journalToggle").setAttribute("aria-expanded", j.classList.contains("open"));
+});
+$("#journalClear").addEventListener("click", () => {
+  $("#journalList").innerHTML = "";
+  journalCount = 0;
+  $("#journalCount").textContent = "";
+  $("#journalLast").textContent = "Журнал очищен";
+  $("#journalLast").style.color = "";
+});
+
+function toast(title, text, kind = "ok") {
+  const t = document.createElement("div");
+  t.className = "toast " + kind;
+  t.innerHTML = `<b>${esc(title)}</b>${text ? esc(text) : ""}`;
+  $("#toasts").append(t);
+  setTimeout(() => t.remove(), kind === "error" ? 9000 : 4500);
+}
+const fail = (title) => (e) => toast(title, e.message, "error");
+
+function confirmBox(title, text, yes = "Удалить") {
+  return new Promise(resolve => {
+    const m = $("#confirm");
+    $("#confirmTitle").textContent = title;
+    $("#confirmText").textContent = text;
+    $("#confirmYes").textContent = yes;
+    m.hidden = false;
+    $("#confirmYes").focus();
+    const done = (v) => { m.hidden = true; $("#confirmYes").onclick = $("#confirmNo").onclick = null; resolve(v); };
+    $("#confirmYes").onclick = () => done(true);
+    $("#confirmNo").onclick = () => done(false);
+  });
+}
+
+// ================================================================ статус базы
+async function refreshStatus() {
+  try {
+    const s = await api("GET", "/api/status", null, "Статус базы", { silent: true });
+    $("#dbpill").className = "dbpill ok";
+    $("#dbtext").innerHTML = `${esc(s.url)} <b>${s.orders}</b> ${plural(s.orders, "заказ", "заказа", "заказов")}, <b>${s.products}</b> ${plural(s.products, "товар", "товара", "товаров")}`;
+  } catch {
+    $("#dbpill").className = "dbpill down";
+    $("#dbtext").textContent = "Нет связи с базой";
+  }
+}
+
+// ================================================================ покупатель
+function renderCustomers() {
+  const opts = state.customers.map(c => `<option value="${c.id}">${esc(c.name)} (id ${c.id})</option>`).join("");
+  $("#customer").innerHTML = opts;
+  $("#customerMobile").innerHTML = opts;
+  $("#customer").value = $("#customerMobile").value = state.customerId;
+}
+function setCustomer(id) {
+  state.customerId = Number(id);
+  store.set("customer", state.customerId);
+  $("#customer").value = $("#customerMobile").value = state.customerId;
+  state.addresses = [];
+  if (state.view === "orders") loadOrders();
+  if ($("#cartSheet").classList.contains("open")) renderCart();
+  if ($("#productSheet").classList.contains("open") && currentProduct) openProduct(currentProduct, { quiet: true });
+}
+$("#customer").addEventListener("change", e => setCustomer(e.target.value));
+$("#customerMobile").addEventListener("change", e => setCustomer(e.target.value));
+const customerName = () => (state.customers.find(c => c.id === state.customerId) || {}).name || "";
+
+// ================================================================ фильтры
+function renderFilters() {
+  const f = state.filters;
+  const roots = state.categories.filter(c => c.parent_id == null);
+  const total = state.categories.reduce((a, c) => a + Number(c.cnt), 0) + Number(state.uncategorized);
+  let html = `<li><button type="button" class="root" data-cat="" aria-pressed="${f.category === ""}"><span>Все товары</span><span>${total}</span></button></li>`;
+  for (const r of roots) {
+    const kids = state.categories.filter(c => c.parent_id === r.id);
+    const cnt = Number(r.cnt) + kids.reduce((a, k) => a + Number(k.cnt), 0);
+    html += `<li><button type="button" class="root" data-cat="${r.id}" aria-pressed="${String(f.category) === String(r.id)}"><span>${esc(r.name)}</span><span>${cnt}</span></button></li>`;
+    for (const k of kids) {
+      html += `<li><button type="button" class="lvl2" data-cat="${k.id}" aria-pressed="${String(f.category) === String(k.id)}"><span>${esc(k.name)}</span><span>${k.cnt}</span></button></li>`;
+    }
+  }
+  if (Number(state.uncategorized) > 0) {
+    html += `<li><button type="button" class="root" data-cat="none" aria-pressed="${f.category === "none"}"><span>Без категории</span><span>${state.uncategorized}</span></button></li>`;
+  }
+  $("#cats").innerHTML = html;
+
+  $("#energy").innerHTML = ENERGY.map((e, i) => `
+    <button type="button" data-energy="${e}" aria-pressed="${f.energy.includes(e)}">
+      <span class="chev" data-c="${e}" style="--w:${58 + i * 14}px">${e}</span>
+    </button>`).join("");
+
+  $("#brands").innerHTML = state.brands.map(b => `
+    <label class="check"><input type="checkbox" value="${b.id}" ${f.brands.includes(b.id) ? "checked" : ""}> ${esc(b.name)}<span>${b.cnt}</span></label>`).join("");
+}
+
+$("#cats").addEventListener("click", e => {
+  const b = e.target.closest("button[data-cat]");
+  if (!b) return;
+  state.filters.category = b.dataset.cat;
+  renderFilters(); loadProducts();
+});
+$("#energy").addEventListener("click", e => {
+  const b = e.target.closest("button[data-energy]");
+  if (!b) return;
+  const f = state.filters.energy, v = b.dataset.energy;
+  state.filters.energy = f.includes(v) ? f.filter(x => x !== v) : [...f, v];
+  renderFilters(); loadProducts();
+});
+$("#brands").addEventListener("change", () => {
+  state.filters.brands = $$("#brands input:checked").map(i => Number(i.value));
+  loadProducts();
+});
+$("#instock").addEventListener("change", e => { state.filters.instock = e.target.checked; loadProducts(); });
+$("#sort").addEventListener("change", e => { state.filters.sort = e.target.value; loadProducts(); });
+let qTimer;
+$("#q").addEventListener("input", e => {
+  clearTimeout(qTimer);
+  qTimer = setTimeout(() => { state.filters.q = e.target.value; if (state.view !== "catalog") showView("catalog"); loadProducts(); }, 350);
+});
+$("#filtersBtn").addEventListener("click", () => $("#filters").classList.toggle("show"));
+$("#promoCode").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText("ТЕХНО1000"); toast("Промокод скопирован", "Вставьте его в корзине при оформлении."); } catch { /* без буфера обмена */ }
+});
+
+// ================================================================ каталог
+async function loadProducts() {
+  const f = state.filters, p = new URLSearchParams();
+  if (f.category) p.set("category", f.category);
+  if (f.brands.length) p.set("brands", f.brands.join(","));
+  if (f.energy.length) p.set("energy", f.energy.join(","));
+  if (f.q.trim()) p.set("q", f.q.trim());
+  if (f.instock) p.set("instock", "1");
+  p.set("sort", f.sort);
+  try {
+    state.products = await api("GET", "/api/products?" + p, null, "Каталог: фильтры и сортировка");
+    renderProducts();
+  } catch (e) {
+    $("#products").innerHTML = `<div class="empty"><b>Каталог не загрузился</b>${esc(e.message)}</div>`;
+  }
+}
+
+function catTitle() {
+  const f = state.filters;
+  if (f.category === "none") return "Без категории";
+  const c = state.categories.find(c => String(c.id) === String(f.category));
+  return c ? c.name : "Все товары";
+}
+
+function cartQty(id) { const it = state.cart.find(i => i.id === id); return it ? it.qty : 0; }
+
+function renderProducts() {
+  const list = state.products;
+  $("#gridTitle").firstChild.textContent = state.filters.q.trim() ? `Поиск «${state.filters.q.trim()}»` : catTitle();
+  $("#gridCount").textContent = `${list.length} ${plural(list.length, "товар", "товара", "товаров")}`;
+  if (!list.length) {
+    $("#products").innerHTML = `<div class="empty" style="grid-column:1/-1"><b>Ничего не нашлось</b>Снимите часть фильтров или поищите по бренду, например «Bosch».</div>`;
+    return;
+  }
+  $("#products").innerHTML = list.map(p => {
+    const [cls, txt] = stockText(p.stock);
+    const q = cartQty(p.id);
+    return `
+    <article class="card" data-id="${p.id}">
+      <button class="pic" data-open="${p.id}" type="button" aria-label="Подробнее: ${esc(p.name)}">${iconFor(p)}</button>
+      ${p.energy_class ? `<span class="chev" data-c="${esc(p.energy_class)}" title="Класс энергопотребления">${esc(p.energy_class)}</span>` : ""}
+      <div class="body">
+        <div class="meta">${esc(p.brand)}${p.model ? ", " + esc(p.model) : ""}</div>
+        <h3><button data-open="${p.id}" type="button">${esc(p.name)}</button></h3>
+        <div class="rating">${Number(p.reviews_cnt) ? `${stars(p.avg_rating)} ${p.reviews_cnt} ${plural(p.reviews_cnt, "отзыв", "отзыва", "отзывов")}` : "Отзывов пока нет"}</div>
+        <div class="price">${rub(p.price)}</div>
+        <div class="stock ${cls}">${txt}</div>
+        <div class="actions">${q ? stepperHtml(p.id, q) : `<button class="btn primary" data-add="${p.id}" type="button">В корзину</button>`}</div>
+      </div>
+    </article>`;
+  }).join("");
+}
+const stepperHtml = (id, q) => `
+  <div class="stepper" data-step="${id}">
+    <button type="button" data-d="-1" aria-label="Меньше">−</button>
+    <input type="number" min="0" value="${q}" aria-label="Количество">
+    <button type="button" data-d="1" aria-label="Больше">+</button>
+  </div>`;
+
+document.addEventListener("click", e => {
+  const open = e.target.closest("[data-open]");
+  if (open) { openProduct(Number(open.dataset.open)); return; }
+  const add = e.target.closest("[data-add]");
+  if (add) {
+    const id = Number(add.dataset.add);
+    const p = state.products.find(x => x.id === id) || (currentProductData && currentProductData.id === id ? currentProductData : null);
+    if (p) addToCart(p, 1);
+    return;
+  }
+  const step = e.target.closest(".stepper[data-step] button");
+  if (step) {
+    const id = Number(step.closest(".stepper").dataset.step);
+    setQty(id, cartQty(id) + Number(step.dataset.d));
+  }
+});
+document.addEventListener("change", e => {
+  const inp = e.target.closest(".stepper[data-step] input");
+  if (inp) setQty(Number(inp.closest(".stepper").dataset.step), Math.max(0, parseInt(inp.value, 10) || 0));
+});
+
+// ================================================================ корзина
+function saveCart() {
+  store.set("cart", state.cart);
+  const n = state.cart.reduce((a, i) => a + i.qty, 0);
+  $("#cartCount").textContent = n || "";
+  if (state.view === "catalog" && state.products.length) renderProducts();
+  if ($("#cartSheet").classList.contains("open")) renderCart();
+  if ($("#productSheet").classList.contains("open") && currentProductData) renderProductBuy();
+}
+function addToCart(p, qty) {
+  const it = state.cart.find(i => i.id === p.id);
+  if (it) it.qty += qty;
+  else state.cart.push({ id: p.id, name: p.name, model: p.model, price: Number(p.price), stock: p.stock, category_id: p.category_id, qty });
+  saveCart();
+}
+function setQty(id, qty) {
+  if (qty <= 0) state.cart = state.cart.filter(i => i.id !== id);
+  else { const it = state.cart.find(i => i.id === id); if (it) it.qty = qty; }
+  saveCart();
+}
+
+async function renderCart() {
+  const body = $("#cartBody"), foot = $("#cartFoot");
+  if (!state.cart.length) {
+    body.innerHTML = `<div class="empty"><b>Корзина пуста</b>Добавьте товар из каталога — заказ попадёт в таблицы orders и order_items.</div>`;
+    foot.innerHTML = `<button class="btn" data-close type="button">Перейти в каталог</button>`;
+    return;
+  }
+  if (!state.addresses.length || state.addresses.cid !== state.customerId) {
+    try {
+      state.addresses = await api("GET", `/api/customers/${state.customerId}/addresses`, null, "Адреса покупателя");
+      state.addresses.cid = state.customerId;
+    } catch (e) { state.addresses = []; }
+  }
+  const sum = state.cart.reduce((a, i) => a + i.price * i.qty, 0);
+  const over = state.cart.filter(i => i.qty > i.stock);
+  const prevAddr = Number(($("input[name=addr]:checked", body) || {}).value) || (state.addresses[0] || {}).id;
+  const prevPay = ($("input[name=pay]:checked", body) || {}).value || "card";
+  const prevPromo = ($("#promoInput") || {}).value || "";
+  body.innerHTML = `
+    <div>
+      ${state.cart.map(i => `
+        <div class="line-item">
+          <div class="ico">${iconFor(i)}</div>
+          <div>
+            <div class="name">${esc(i.name)}</div>
+            <div class="sub">${i.model ? esc(i.model) + ", " : ""}${rub(i.price)} за шт.</div>
+            ${i.qty > i.stock ? `<div class="sub" style="color:var(--warn)">На складе ${i.stock} шт. — база не даст оформить больше</div>` : ""}
+          </div>
+          <div class="right">
+            <b>${rub(i.price * i.qty)}</b>
+            ${stepperHtml(i.id, i.qty)}
+          </div>
+        </div>`).join("")}
+    </div>
+    <div class="section">
+      <h4>Покупатель</h4>
+      <p class="hint" style="font-size:14px;color:var(--ink)">${esc(customerName())}</p>
+    </div>
+    <div class="section">
+      <h4>Адрес доставки</h4>
+      <div class="choice">
+        ${state.addresses.length ? state.addresses.map(a => `
+          <label><input type="radio" name="addr" value="${a.id}" ${a.id === prevAddr ? "checked" : ""}>
+            <span>${esc(a.city)}, ${esc(a.street)}<small>${a.postal_code ? "индекс " + esc(a.postal_code) : ""}${a.is_default ? (a.postal_code ? ", " : "") + "основной адрес" : ""}</small></span></label>`).join("")
+          : `<p class="hint">У покупателя нет адресов в таблице addresses.</p>`}
+      </div>
+    </div>
+    <div class="section">
+      <h4>Оплата</h4>
+      <div class="choice">
+        <label><input type="radio" name="pay" value="card" ${prevPay === "card" ? "checked" : ""}><span>Картой онлайн<small>Строка в payments, заказ сразу «Оплачен»</small></span></label>
+        <label><input type="radio" name="pay" value="sbp" ${prevPay === "sbp" ? "checked" : ""}><span>Через СБП<small>Строка в payments, заказ сразу «Оплачен»</small></span></label>
+        <label><input type="radio" name="pay" value="cash" ${prevPay === "cash" ? "checked" : ""}><span>Наличными при получении<small>Платежа пока нет, заказ «Новый»</small></span></label>
+      </div>
+    </div>
+    <div class="section">
+      <h4><label for="promoInput">Промокод</label></h4>
+      <div class="promo-row"><input class="field" id="promoInput" placeholder="ТЕХНО1000" value="${esc(prevPromo)}"></div>
+    </div>`;
+  const disc = /^(ТЕХНО1000|TECHNO1000)$/i.test(prevPromo.trim()) ? 1000 : 0;
+  foot.innerHTML = `
+    <div class="totals">
+      <div><span>Товары</span><span>${rub(sum)}</span></div>
+      ${disc ? `<div><span>Скидка по промокоду</span><span>−${rub(disc)}</span></div>` : ""}
+      <div class="grand"><span>Итого</span><span>${rub(sum - disc)}</span></div>
+    </div>
+    ${over.length ? `<p class="hint" style="color:var(--warn)">В корзине больше, чем на складе. Сайт не останавливает вас специально: при оформлении CHECK (stock >= 0) отклонит списание и транзакция откатится.</p>` : ""}
+    <button class="btn primary" id="checkout" type="button" ${state.addresses.length ? "" : "disabled"}>Оформить заказ</button>`;
+  $("#promoInput").addEventListener("change", renderCart);
+  $("#checkout").addEventListener("click", checkout);
+}
+
+async function checkout() {
+  const btn = $("#checkout");
+  const addressId = Number(($("input[name=addr]:checked") || {}).value);
+  if (!addressId) { toast("Выберите адрес доставки", "", "error"); return; }
+  btn.disabled = true; btn.textContent = "Оформляю…";
+  try {
+    const o = await api("POST", "/api/orders", {
+      customerId: state.customerId, addressId,
+      payment: $("input[name=pay]:checked").value,
+      promo: $("#promoInput").value,
+      items: state.cart.map(i => ({ productId: i.id, qty: i.qty }))
+    }, "Оформление заказа (транзакция)");
+    state.cart = [];
+    saveCart();
+    closeSheets();
+    state.freshOrder = o.id;
+    toast(`Заказ №${o.id} оформлен`, `Статус «${STATUS[o.status]}», сумма ${rub(o.total)}. Транзакция зафиксирована: COMMIT.`);
+    refreshStatus();
+    showView("orders");
+  } catch (e) {
+    toast("Заказ не оформлен", e.message, "error");
+    btn.disabled = false; btn.textContent = "Оформить заказ";
+    openJournal();
+  }
+}
+function openJournal() { const j = $("#journal"); if (!j.classList.contains("open")) $("#journalToggle").click(); }
+
+// ================================================================ карточка товара
+let currentProduct = null, currentProductData = null, reviewRating = 5, quickQty = 1;
+async function openProduct(id, { quiet = false } = {}) {
+  currentProduct = id;
+  if (!quiet) { quickQty = 1; reviewRating = 5; }
+  openSheet("productSheet");
+  if (!quiet) $("#pdBody").innerHTML = `<p class="hint">Загружаю товар…</p>`;
+  try {
+    currentProductData = await api("GET", `/api/products/${id}`, null, "Карточка товара");
+    renderProduct();
+  } catch (e) {
+    $("#pdBody").innerHTML = `<div class="empty"><b>Товар не открылся</b>${esc(e.message)}</div>`;
+  }
+}
+
+function renderProduct() {
+  const p = currentProductData;
+  $("#pdTitle").textContent = p.category;
+  const mine = p.reviews.find(r => r.customer_id === state.customerId);
+  $("#pdBody").innerHTML = `
+    <div class="pd-top">
+      <div class="pd-pic">${iconFor(p)}</div>
+      <div>
+        ${p.energy_class ? `<span class="chev" data-c="${esc(p.energy_class)}">${esc(p.energy_class)}</span>` : ""}
+        <h3>${esc(p.name)}</h3>
+        <div class="meta">${esc(p.brand)}, модель ${esc(p.model || "—")}</div>
+        <div class="rating" style="margin-top:6px">${p.reviews.length ? `${stars(p.avg_rating)} ${Number(p.avg_rating).toFixed(1)}, ${p.reviews.length} ${plural(p.reviews.length, "отзыв", "отзыва", "отзывов")}` : "Отзывов пока нет"}</div>
+        ${p.description ? `<p style="margin:10px 0 0;color:var(--ink-2)">${esc(p.description)}</p>` : ""}
+      </div>
+    </div>
+    <div class="section" id="pdBuy"></div>
+    <div class="section">
+      <h4>Характеристики</h4>
+      <table class="specs">
+        <tr><th>Категория</th><td>${p.parent_category ? esc(p.parent_category) + " / " : ""}${esc(p.category)}</td></tr>
+        <tr><th>Бренд</th><td>${esc(p.brand)}${p.brand_country ? ", " + esc(p.brand_country) : ""}</td></tr>
+        <tr><th>Гарантия</th><td>${p.warranty_months ? p.warranty_months + " мес." : "—"}</td></tr>
+        <tr><th>Мощность</th><td>${p.power_watt ? p.power_watt + " Вт" : "—"}</td></tr>
+        <tr><th>Класс энергопотребления</th><td>${esc(p.energy_class || "—")}</td></tr>
+        <tr><th>Продано</th><td>${p.sold_qty || 0} шт. (без отменённых заказов)</td></tr>
+        <tr><th>Артикул</th><td>${esc(p.sku || "—")}</td></tr>
+        <tr><th>id в products</th><td>${p.id}</td></tr>
+      </table>
+    </div>
+    <div class="section">
+      <h4>Поставщики</h4>
+      ${p.suppliers.length ? `<table class="specs">${p.suppliers.map(s => `<tr><th>${esc(s.name)}</th><td>закупка ${rub(s.supply_price)}</td></tr>`).join("")}</table>`
+        : `<p class="hint">У товара нет поставщиков в product_suppliers — он виден в FULL JOIN из части 4.</p>`}
+    </div>
+    <div class="section">
+      <h4>Отзывы</h4>
+      ${mine ? `<p class="hint">${esc(customerName())} уже оставил(а) отзыв. Попробуйте отправить ещё один — база ответит ошибкой UNIQUE.</p>` : ""}
+      <form class="review-form" id="reviewForm">
+        <div class="star-input" role="radiogroup" aria-label="Оценка">
+          ${[1, 2, 3, 4, 5].map(n => `<button type="button" role="radio" aria-checked="${n === reviewRating}" aria-label="${n} из 5" data-star="${n}" class="${n <= reviewRating ? "on" : ""}">★</button>`).join("")}
+        </div>
+        <label class="sr" for="reviewText">Текст отзыва</label>
+        <textarea class="field" id="reviewText" rows="2" placeholder="Что понравилось, что нет"></textarea>
+        <div><button class="btn primary small" type="submit">Оставить отзыв от имени ${esc(customerName().split(" ")[0])}</button></div>
+      </form>
+      <div>
+        ${p.reviews.map(r => `
+          <div class="review">
+            <header><span><b>${esc(r.customer)}</b> ${stars(r.rating)}</span><time>${dt(r.created_at)}</time></header>
+            ${r.comment ? `<p>${esc(r.comment)}</p>` : ""}
+          </div>`).join("") || `<p class="hint">Станьте первым, кто оценит этот товар.</p>`}
+      </div>
+    </div>`;
+  renderProductBuy();
+  $$("#reviewForm [data-star]").forEach(b => b.addEventListener("click", () => {
+    reviewRating = Number(b.dataset.star);
+    $$("#reviewForm [data-star]").forEach(x => { x.classList.toggle("on", Number(x.dataset.star) <= reviewRating); x.setAttribute("aria-checked", Number(x.dataset.star) === reviewRating); });
+  }));
+  $("#reviewForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    try {
+      await api("POST", "/api/reviews", { productId: p.id, customerId: state.customerId, rating: reviewRating, comment: $("#reviewText").value }, "Новый отзыв");
+      toast("Отзыв опубликован", "Строка добавлена в reviews.");
+      refreshStatus();
+      openProduct(p.id, { quiet: true });
+      loadProducts();
+    } catch (err) { toast("Отзыв не сохранён", err.message, "error"); openJournal(); }
+  });
+}
+
+function renderProductBuy() {
+  const p = currentProductData, box = $("#pdBuy");
+  if (!box) return;
+  const [cls, txt] = stockText(p.stock);
+  const q = cartQty(p.id);
+  box.innerHTML = `
+    <div class="pd-buy">
+      <div class="price">${rub(p.price)}</div>
+      ${q ? stepperHtml(p.id, q) : `<button class="btn primary" data-add="${p.id}" type="button">В корзину</button>`}
+    </div>
+    <div class="stock ${cls}" style="margin:6px 0 14px">${txt}</div>
+    <div class="review-form">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <div class="stepper" id="quickStep">
+          <button type="button" data-q="-1" aria-label="Меньше">−</button>
+          <input type="number" min="1" value="${quickQty}" aria-label="Количество для покупки в 1 клик">
+          <button type="button" data-q="1" aria-label="Больше">+</button>
+        </div>
+        <button class="btn" id="quickBuy" type="button">Купить в 1 клик</button>
+      </div>
+      <p class="hint">Заказ оформит функция place_order(${state.customerId}, ${p.id}, ${quickQty}) на основной адрес. Если товара не хватит, функция выбросит исключение и откатит заказ.</p>
+    </div>`;
+  $$("#quickStep button").forEach(b => b.addEventListener("click", () => { quickQty = Math.max(1, quickQty + Number(b.dataset.q)); renderProductBuy(); }));
+  $("#quickStep input").addEventListener("change", e => { quickQty = Math.max(1, parseInt(e.target.value, 10) || 1); renderProductBuy(); });
+  $("#quickBuy").addEventListener("click", async () => {
+    $("#quickBuy").disabled = true;
+    try {
+      const o = await api("POST", "/api/orders/quick", { customerId: state.customerId, productId: p.id, qty: quickQty }, "Купить в 1 клик (place_order)");
+      state.freshOrder = o.id;
+      toast(`Заказ №${o.id} оформлен`, `place_order вернула id ${o.id}, сумма ${rub(o.total)}.`);
+      refreshStatus();
+      closeSheets();
+      showView("orders");
+    } catch (e) {
+      toast("Заказ не оформлен", e.message, "error");
+      openJournal();
+      $("#quickBuy").disabled = false;
+    }
+  });
+}
+
+// ================================================================ панели
+function openSheet(id) {
+  $$(".sheet.open").forEach(s => { if (s.id !== id) { s.classList.remove("open"); s.setAttribute("aria-hidden", "true"); } });
+  const s = document.getElementById(id);
+  s.classList.add("open");
+  s.setAttribute("aria-hidden", "false");
+  $("#scrim").hidden = false;
+  setTimeout(() => $(".x", s).focus(), 50);
+}
+function closeSheets() {
+  $$(".sheet.open").forEach(s => { s.classList.remove("open"); s.setAttribute("aria-hidden", "true"); });
+  $("#scrim").hidden = true;
+  currentProduct = null;
+}
+$("#scrim").addEventListener("click", closeSheets);
+document.addEventListener("click", e => { if (e.target.closest("[data-close]")) closeSheets(); });
+document.addEventListener("keydown", e => {
+  if (e.key !== "Escape") return;
+  if (!$("#confirm").hidden) $("#confirmNo").click();
+  else closeSheets();
+});
+$("#cartBtn").addEventListener("click", () => { openSheet("cartSheet"); renderCart(); });
+
+// ================================================================ мои заказы
+async function loadOrders() {
+  $("#ordersWho").textContent = `${customerName()}. Сменить покупателя можно в шапке.`;
+  let orders;
+  try {
+    orders = await api("GET", `/api/customers/${state.customerId}/orders`, null, "Заказы покупателя");
+  } catch (e) {
+    $("#orders").innerHTML = `<div class="empty"><b>Заказы не загрузились</b>${esc(e.message)}</div>`;
+    return;
+  }
+  if (!orders.length) {
+    $("#orders").innerHTML = `<div class="empty"><b>У этого покупателя пока нет заказов</b>Выберите товар в каталоге и оформите заказ — он появится здесь и в таблице orders.</div>`;
+    return;
+  }
+  $("#orders").innerHTML = orders.map(o => `
+    <article class="order ${o.id === state.freshOrder ? "fresh" : ""}" id="order-${o.id}">
+      <div class="order-head">
+        <h3>Заказ №${o.id}</h3>
+        <span class="status ${esc(o.status)}">${STATUS[o.status] || esc(o.status)}</span>
+        <span class="when">${dt(o.created_at)}</span>
+        <span class="sum">${rub(o.total)}</span>
+      </div>
+      <div class="addr">${o.city ? `${esc(o.city)}, ${esc(o.street)}` : "Адрес не указан"}</div>
+      ${o.items.length ? `<ul class="order-items">${o.items.map(i => `
+        <li><span>${esc(i.name)}${i.model ? ", " + esc(i.model) : ""}</span><span>${i.quantity} × ${rub(i.unit_price)}</span></li>`).join("")}</ul>`
+        : `<p class="hint">В заказе нет позиций — это заказ из особых случаев тестовых данных.</p>`}
+      <div class="order-foot">
+        <span>${Number(o.paid) > 0 ? `Оплачено ${rub(o.paid)}${o.methods ? " " + o.methods.split(", ").map(m => PAY[m] || m).join(" и ") : ""}` : o.status === "cancelled" && o.methods ? "Платёж возвращён" : "Не оплачен"}${Number(o.paid) > 0 && Number(o.paid) !== Number(o.total) ? "" : ""}</span>
+        ${o.status === "new" || o.status === "paid" ? `<button class="btn small danger" data-cancel="${o.id}" type="button">Отменить заказ</button>` : ""}
+      </div>
+    </article>`).join("");
+  if (state.freshOrder) {
+    const el = document.getElementById("order-" + state.freshOrder);
+    if (el) el.scrollIntoView({ block: "center" });
+    state.freshOrder = null;
+  }
+}
+$("#orders").addEventListener("click", async e => {
+  const b = e.target.closest("[data-cancel]");
+  if (!b) return;
+  const id = Number(b.dataset.cancel);
+  if (!await confirmBox(`Отменить заказ №${id}?`, "Товар вернётся на склад, платёж будет помечен как возвращённый. Всё — одной транзакцией.", "Отменить заказ")) return;
+  try {
+    await api("POST", `/api/orders/${id}/cancel`, { customerId: state.customerId }, "Отмена заказа (транзакция)");
+    toast(`Заказ №${id} отменён`, "Остатки на складе восстановлены.");
+    refreshStatus();
+    loadOrders();
+  } catch (err) { toast("Заказ не отменён", err.message, "error"); }
+});
+
+// ================================================================ управление
+async function loadAdmin() {
+  await Promise.all([loadCounts(), loadAdminOrders(), loadAdminProducts()]);
+}
+async function loadCounts() {
+  try {
+    const rows = await api("GET", "/api/admin/counts", null, "Число строк в таблицах (UNION ALL)");
+    const prev = state.lastCounts;
+    $("#counts").innerHTML = rows.map(r => {
+      const d = prev && prev[r.tbl] != null ? Number(r.cnt) - prev[r.tbl] : 0;
+      return `<div><code>${esc(r.tbl)}</code><b>${r.cnt}${d ? `<span class="delta ${d > 0 ? "up" : "down"}">${d > 0 ? "+" : "−"}${Math.abs(d)}</span>` : ""}</b></div>`;
+    }).join("");
+    state.lastCounts = Object.fromEntries(rows.map(r => [r.tbl, Number(r.cnt)]));
+  } catch (e) { $("#counts").innerHTML = `<div class="empty" style="grid-column:1/-1">${esc(e.message)}</div>`; }
+}
+async function loadAdminOrders() {
+  const st = $("#statusFilter").value;
+  try {
+    const rows = await api("GET", "/api/admin/orders" + (st ? "?status=" + st : ""), null, "Заказы из v_order_summary");
+    $("#adminOrders").innerHTML = `
+      <thead><tr><th>№</th><th>Покупатель</th><th class="num">Позиций</th><th class="num">Сумма</th><th>Статус</th><th>Создан</th><th></th></tr></thead>
+      <tbody>${rows.map(o => `
+        <tr data-oid="${o.order_id}">
+          <td>${o.order_id}</td>
+          <td>${esc(o.customer_name)}</td>
+          <td class="num">${o.items_cnt}</td>
+          <td class="num">${rub(o.total)}</td>
+          <td><select class="field" data-status="${o.order_id}" aria-label="Статус заказа ${o.order_id}">
+            ${Object.entries(STATUS).map(([k, v]) => `<option value="${k}" ${k === o.status ? "selected" : ""}>${v}</option>`).join("")}
+          </select></td>
+          <td style="white-space:nowrap;color:var(--ink-2)">${new Date(o.created_at).toLocaleDateString("ru-RU")}</td>
+          <td><div class="row-actions"><button class="btn small danger" data-del-order="${o.order_id}" data-items="${o.items_cnt}" type="button">Удалить</button></div></td>
+        </tr>`).join("")}</tbody>`;
+    if (!rows.length) $("#adminOrders").innerHTML = `<tbody><tr><td style="padding:24px;color:var(--ink-2)">Заказов с таким статусом нет.</td></tr></tbody>`;
+  } catch (e) { $("#adminOrders").innerHTML = `<tbody><tr><td>${esc(e.message)}</td></tr></tbody>`; }
+}
+async function loadAdminProducts() {
+  try {
+    const rows = state.adminProducts = await api("GET", "/api/admin/products", null, "Товары из v_product_stats");
+    $("#adminProducts").innerHTML = `
+      <thead><tr><th>id</th><th>Товар</th><th>Категория</th><th class="num">Цена, ₽</th><th class="num">Остаток</th><th class="num">Продано</th><th class="num">Рейтинг</th><th></th></tr></thead>
+      <tbody>${rows.map(p => `
+        <tr data-pid="${p.id}">
+          <td>${p.id}</td>
+          <td><b style="font-weight:500">${esc(p.name)}</b><div style="font-size:13px;color:var(--ink-3)">${esc(p.brand)}, ${esc(p.model || "—")}</div></td>
+          <td style="color:var(--ink-2)">${esc(p.category)}</td>
+          <td class="num"><input class="field" data-price value="${Number(p.price)}" inputmode="decimal" aria-label="Цена товара ${p.id}"></td>
+          <td class="num"><input class="field" data-stock value="${p.stock}" inputmode="numeric" style="width:80px" aria-label="Остаток товара ${p.id}"></td>
+          <td class="num">${p.sold_qty}</td>
+          <td class="num">${Number(p.avg_rating) ? Number(p.avg_rating).toFixed(2) : "—"}</td>
+          <td><div class="row-actions">
+            <button class="btn small" data-save="${p.id}" type="button">Сохранить</button>
+            <button class="btn small danger" data-del-product="${p.id}" type="button">Удалить</button>
+          </div></td>
+        </tr>`).join("")}</tbody>`;
+  } catch (e) { $("#adminProducts").innerHTML = `<tbody><tr><td>${esc(e.message)}</td></tr></tbody>`; }
+}
+function flashRow(sel) { const r = $(sel); if (r) { r.classList.add("flash"); setTimeout(() => r.classList.remove("flash"), 1400); } }
+
+$("#statusFilter").addEventListener("change", loadAdminOrders);
+$("#adminRefresh").addEventListener("click", loadAdmin);
+$("#adminOrders").addEventListener("change", async e => {
+  const s = e.target.closest("[data-status]");
+  if (!s) return;
+  const id = Number(s.dataset.status);
+  try {
+    await api("POST", `/api/admin/orders/${id}/status`, { status: s.value }, "Смена статуса заказа");
+    toast(`Заказ №${id}: «${STATUS[s.value]}»`, "UPDATE orders выполнен.");
+    flashRow(`tr[data-oid="${id}"]`);
+  } catch (err) { toast("Статус не изменён", err.message, "error"); loadAdminOrders(); }
+});
+$("#adminOrders").addEventListener("click", async e => {
+  const b = e.target.closest("[data-del-order]");
+  if (!b) return;
+  const id = Number(b.dataset.delOrder);
+  if (!await confirmBox(`Удалить заказ №${id}?`, `ON DELETE CASCADE удалит вместе с ним позиции (${b.dataset.items}) и платежи. Вернуть можно только пересозданием базы.`)) return;
+  try {
+    const r = await api("POST", `/api/admin/orders/${id}/delete`, {}, "Удаление заказа (CASCADE)");
+    toast(`Заказ №${id} удалён`, `Каскадом удалено позиций: ${r.items}, платежей: ${r.payments}. После удаления осталось: ${r.itemsAfter} и ${r.paymentsAfter}.`);
+    refreshStatus(); loadAdmin();
+  } catch (err) { toast("Заказ не удалён", err.message, "error"); }
+});
+$("#adminProducts").addEventListener("click", async e => {
+  const save = e.target.closest("[data-save]");
+  if (save) {
+    const id = Number(save.dataset.save), row = save.closest("tr");
+    try {
+      await api("POST", `/api/admin/products/${id}`, { price: $("[data-price]", row).value, stock: $("[data-stock]", row).value }, "Изменение цены и остатка");
+      toast(`Товар ${id} обновлён`, "Новые цена и остаток уже видны в каталоге и во view.");
+      flashRow(`tr[data-pid="${id}"]`);
+      loadProducts();
+    } catch (err) { toast("Товар не сохранён", err.message, "error"); openJournal(); }
+    return;
+  }
+  const del = e.target.closest("[data-del-product]");
+  if (del) {
+    const id = Number(del.dataset.delProduct);
+    const p = state.adminProducts.find(x => x.id === id);
+    if (!await confirmBox(`Удалить «${p ? p.name : id}»?`, "Если товар есть хотя бы в одном заказе, база откажет: ON DELETE RESTRICT. Отзывы и поставки удалятся каскадом.")) return;
+    try {
+      await api("POST", `/api/admin/products/${id}/delete`, {}, "Удаление товара");
+      toast("Товар удалён", "Его отзывы и поставки удалены каскадом.");
+      refreshStatus(); loadAdmin(); loadMeta().then(loadProducts);
+      state.cart = state.cart.filter(i => i.id !== id); saveCart();
+    } catch (err) { toast("Товар не удалён", err.message, "error"); openJournal(); }
+  }
+});
+$("#newProductBtn").addEventListener("click", () => { const f = $("#newProduct"); f.hidden = !f.hidden; if (!f.hidden) f.name.focus(); });
+$("#newProduct").addEventListener("submit", async e => {
+  e.preventDefault();
+  const f = e.target, data = Object.fromEntries(new FormData(f));
+  try {
+    const r = await api("POST", "/api/admin/products", data, "Новый товар (INSERT)");
+    toast(`Товар добавлен, id ${r.id}`, "Он уже в каталоге.");
+    f.reset(); f.hidden = true;
+    refreshStatus(); loadAdmin(); loadMeta().then(loadProducts);
+  } catch (err) { toast("Товар не добавлен", err.message, "error"); openJournal(); }
+});
+function renderProductForm() {
+  $("#npBrand").innerHTML = state.brands.map(b => `<option value="${b.id}">${esc(b.name)}</option>`).join("");
+  $("#npCat").innerHTML = `<option value="">Без категории</option>` + state.categories.map(c => `<option value="${c.id}">${c.parent_id ? "— " : ""}${esc(c.name)}</option>`).join("");
+}
+
+// ================================================================ разделы
+function showView(v) {
+  state.view = v;
+  $$(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.view === v));
+  $$(".view").forEach(s => { s.hidden = s.id !== "view-" + v; });
+  if (v === "catalog") loadProducts();
+  if (v === "orders") loadOrders();
+  if (v === "admin") loadAdmin();
+  window.scrollTo({ top: 0 });
+}
+$$(".tab").forEach(t => t.addEventListener("click", () => showView(t.dataset.view)));
+
+// ================================================================ старт
+async function loadMeta() {
+  const m = await api("GET", "/api/meta", null, "Справочники: дерево категорий, бренды, покупатели");
+  Object.assign(state, { categories: m.categories, brands: m.brands, customers: m.customers, uncategorized: m.uncategorized });
+  if (!state.customers.find(c => c.id === state.customerId) && state.customers.length) state.customerId = state.customers[0].id;
+  renderCustomers(); renderFilters(); renderProductForm();
+}
+(async function start() {
+  saveCart();
+  refreshStatus();
+  setInterval(refreshStatus, 10000);
+  try { await loadMeta(); } catch (e) { $("#products").innerHTML = `<div class="empty" style="grid-column:1/-1"><b>Нет данных из базы</b>${esc(e.message)}</div>`; return; }
+  loadProducts();
+})();
+</script>
+</body>
+</html>
