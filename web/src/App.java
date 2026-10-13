@@ -225,7 +225,7 @@ public final class App {
             };
 
             String sql = with + """
-                SELECT p.id, p.name, p.model, p.price, p.stock, p.energy_class, p.power_watt,
+                SELECT p.id, p.name, p.model, p.description, p.price, p.stock, p.energy_class, p.power_watt,
                        p.category_id, COALESCE(c.name, 'Без категории') AS category,
                        c.parent_id AS category_parent, b.name AS brand,
                        s.avg_rating, s.sold_qty,
@@ -307,7 +307,7 @@ public final class App {
                 ORDER BY o.created_at DESC, o.id DESC
                 """, cid);
             List<Map<String, Object>> items = db.query("""
-                SELECT oi.order_id, oi.product_id, p.name, p.model, oi.quantity, oi.unit_price,
+                SELECT oi.order_id, oi.product_id, p.name, p.model, p.description, oi.quantity, oi.unit_price,
                        p.category_id, c.parent_id AS category_parent
                 FROM order_items oi
                 JOIN orders o   ON o.id = oi.order_id

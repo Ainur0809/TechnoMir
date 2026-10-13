@@ -182,7 +182,7 @@ main { max-width: 1320px; margin: 0 auto; padding: 24px; }
 .chev[data-c="A"]   { --c: var(--e-a); color: #2B3300; }
 .chev[data-c="B"]   { --c: var(--e-b); color: #3B3400; }
 .chev[data-c="C"]   { --c: var(--e-c); color: #3E2700; }
-.energy-pick .chev { width: var(--w); }
+.energy-pick .chev { --w: 60px; width: var(--w); }
 
 .grid-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
 .grid-head h2 { font: 500 24px/1.2 var(--display); }
@@ -196,10 +196,11 @@ main { max-width: 1320px; margin: 0 auto; padding: 24px; }
 }
 .card:hover { border-color: var(--ink-3); }
 .card .pic {
-  border: 0; padding: 0; background: var(--tint); aspect-ratio: 4 / 3; display: grid; place-items: center;
-  color: var(--ink-2); width: 100%;
+  border: 0; padding: 0; aspect-ratio: 4 / 3; display: grid; place-items: center; width: 100%;
+  background: radial-gradient(120% 90% at 50% 30%, #ffffff 0%, #f1f4f3 55%, #e2e8e6 100%);
 }
-.card .pic svg { width: 44%; height: auto; }
+.card .pic svg { width: 62%; height: 92%; transition: transform .25s ease; }
+.card:hover .pic svg { transform: scale(1.04); }
 .card .chev { position: absolute; top: 14px; left: 0; border-radius: 0; }
 .card .body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
 .card .meta { font-size: 13px; color: var(--ink-3); }
@@ -240,8 +241,8 @@ main { max-width: 1320px; margin: 0 auto; padding: 24px; }
 .x { width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--bg); display: grid; place-items: center; }
 
 .pd-top { display: grid; grid-template-columns: 160px 1fr; gap: 20px; align-items: start; }
-.pd-pic { background: var(--tint); border-radius: var(--r-m); aspect-ratio: 1; display: grid; place-items: center; color: var(--ink-2); position: relative; }
-.pd-pic svg { width: 60%; }
+.pd-pic { background: radial-gradient(120% 90% at 50% 30%, #ffffff 0%, #f1f4f3 55%, #e2e8e6 100%); border-radius: var(--r-m); aspect-ratio: 1; display: grid; place-items: center; position: relative; border: 1px solid var(--line); }
+.pd-pic svg { width: 88%; height: 88%; }
 .pd-top h3 { font: 500 20px/1.3 var(--display); margin: 8px 0 4px; }
 .pd-top .meta { color: var(--ink-3); font-size: 14px; }
 .pd-buy { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
@@ -261,8 +262,8 @@ main { max-width: 1320px; margin: 0 auto; padding: 24px; }
 .star-input button.on { color: #E2A100; }
 
 .line-item { display: grid; grid-template-columns: 56px 1fr auto; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--bg); }
-.line-item .ico { width: 56px; height: 56px; border-radius: var(--r-s); background: var(--tint); display: grid; place-items: center; color: var(--ink-2); }
-.line-item .ico svg { width: 34px; }
+.line-item .ico { width: 56px; height: 56px; border-radius: var(--r-s); background: radial-gradient(circle at 50% 35%, #fff, #e6ebe9); display: grid; place-items: center; border: 1px solid var(--line); }
+.line-item .ico svg { width: 50px; height: 50px; }
 .line-item .name { font-weight: 500; font-size: 14px; line-height: 1.35; }
 .line-item .sub { font-size: 13px; color: var(--ink-3); }
 .line-item .right { display: grid; justify-items: end; gap: 6px; }
@@ -303,7 +304,11 @@ main { max-width: 1320px; margin: 0 auto; padding: 24px; }
 .order .addr { color: var(--ink-2); font-size: 14px; margin: 6px 0 10px; }
 .order-items { list-style: none; margin: 0; padding: 0; font-size: 14px; }
 .order-items li { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-top: 1px solid var(--bg); }
-.order-items li span:last-child { color: var(--ink-2); white-space: nowrap; }
+.order-items li { align-items: center; }
+.order-items li > span:last-child { color: var(--ink-2); white-space: nowrap; }
+.oi-name { display: flex; align-items: center; gap: 10px; }
+.oi-pic { width: 40px; height: 40px; flex-shrink: 0; border-radius: var(--r-s); background: radial-gradient(circle at 50% 35%, #fff, #e6ebe9); display: grid; place-items: center; }
+.oi-pic svg { width: 36px; height: 36px; }
 .order-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 12px; font-size: 14px; color: var(--ink-2); flex-wrap: wrap; }
 
 /* ---------- управление ---------- */
@@ -598,6 +603,7 @@ table.data select.field { width: 130px; }
   <div class="journal-list" id="journalList"></div>
 </section>
 
+<script src="art.js"></script>
 <script>
 "use strict";
 
@@ -629,7 +635,7 @@ const ICONS = {
   10: I('<path d="M16 6h16l-3 20H19z"/><path d="M14 26h20l-2 8H16z"/><path d="M18 34h12v8H18z"/><path d="M24 14v6"/>'),
   0: I('<path d="M17 4v10M31 4v10"/><path d="M12 14h24v8a12 12 0 0 1-24 0z"/><path d="M24 34v10"/>')
 };
-const iconFor = (p) => ICONS[p.category_id] || ICONS[0];
+const iconFor = (p) => ART(p);
 const stars = (r) => {
   const n = Math.round(Number(r) || 0);
   return `<span class="stars" aria-label="Рейтинг ${Number(r || 0).toFixed(1)} из 5">${"★".repeat(n)}<span class="off">${"★".repeat(5 - n)}</span></span>`;
@@ -939,7 +945,7 @@ function saveCart() {
 function addToCart(p, qty) {
   const it = state.cart.find(i => i.id === p.id);
   if (it) it.qty += qty;
-  else state.cart.push({ id: p.id, name: p.name, model: p.model, price: Number(p.price), stock: p.stock, category_id: p.category_id, qty });
+  else state.cart.push({ id: p.id, name: p.name, model: p.model, description: p.description, price: Number(p.price), stock: p.stock, category_id: p.category_id, qty });
   saveCart();
 }
 function setQty(id, qty) {
@@ -1220,7 +1226,7 @@ async function loadOrders() {
       </div>
       <div class="addr">${o.city ? `${esc(o.city)}, ${esc(o.street)}` : "Адрес не указан"}</div>
       ${o.items.length ? `<ul class="order-items">${o.items.map(i => `
-        <li><span>${esc(i.name)}${i.model ? ", " + esc(i.model) : ""}</span><span>${i.quantity} × ${rub(i.unit_price)}</span></li>`).join("")}</ul>`
+        <li><span class="oi-name"><span class="oi-pic">${iconFor({ ...i, id: i.product_id })}</span>${esc(i.name)}${i.model ? ", " + esc(i.model) : ""}</span><span>${i.quantity} × ${rub(i.unit_price)}</span></li>`).join("")}</ul>`
         : `<p class="hint">В заказе нет позиций — это заказ из особых случаев тестовых данных.</p>`}
       <div class="order-foot">
         <span>${Number(o.paid) > 0 ? `Оплачено ${rub(o.paid)}${o.methods ? " " + o.methods.split(", ").map(m => PAY[m] || m).join(" и ") : ""}` : o.status === "cancelled" && o.methods ? "Платёж возвращён" : "Не оплачен"}${Number(o.paid) > 0 && Number(o.paid) !== Number(o.total) ? "" : ""}</span>
